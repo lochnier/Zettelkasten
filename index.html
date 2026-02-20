@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Codex — Research Companion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0f14;--surface:#12181f;--surface2:#1a2230;--surface3:#223040;--gold:#c9a84c;--gold-light:#e8c97a;--gold-dim:#6b5420;--cream:#f0e8d5;--cream-dim:#9a8870;--border:rgba(201,168,76,.18);--border-strong:rgba(201,168,76,.45);--shadow:0 6px 30px rgba(0,0,0,.7);--radius:14px;--nav-h:64px;--fsc:16px}
+body.light{--bg:#f5f0e8;--surface:#fffdf7;--surface2:#f0ead8;--surface3:#e8dfc8;--cream:#2a1f0e;--cream-dim:#7a6a50;--border:rgba(107,84,32,.22);--border-strong:rgba(107,84,32,.5);--shadow:0 4px 20px rgba(0,0,0,.12)}
+body.light .header{background:linear-gradient(180deg,#ece5d0,#fffdf7)}
+body.light .nav{background:linear-gradient(0deg,#ece5d0,rgba(245,240,232,.97))}
+body.fs-sm{--fsc:13px} body.fs-lg{--fsc:19px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--cream);font-family:'EB Garamond',serif;font-size:16px;overflow:hidden;height:100vh;height:-webkit-fill-available}
+#app{display:flex;flex-direction:column;height:100vh;height:-webkit-fill-available}
+#pages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 8px)}
+.page{display:none;padding:14px;animation:fadeUp .22s ease}.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.header{background:linear-gradient(180deg,#070a0e,var(--surface));border-bottom:1px solid var(--border);padding:max(env(safe-area-inset-top),14px) 14px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10}
+.hw{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3.5px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:1px}
+.hs{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--gold-light);line-height:1.1}
+.hl{flex:1}
+.hbtn{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--gold);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;flex-shrink:0}
+.hbtn:active{transform:scale(.88);background:var(--surface3)}
+.nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));background:linear-gradient(0deg,#050709,rgba(11,15,20,.97));border-top:1px solid var(--border);display:flex;align-items:flex-start;padding-top:6px;z-index:100}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;cursor:pointer;border-radius:10px;margin:0 1px}
+.ni:active{opacity:.7}
+.ni-icon{font-size:17px;line-height:1}
+.ni-label{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.6px;color:var(--cream-dim);white-space:nowrap}
+.ni.active .ni-label{color:var(--gold)}
+.ni.active .ni-icon{filter:drop-shadow(0 0 5px var(--gold))}
+.ni-dot{width:3px;height:3px;border-radius:50%;background:var(--gold);opacity:0;margin-top:-1px}
+.ni.active .ni-dot{opacity:1}
+.fab{position:fixed;bottom:calc(var(--nav-h)+14px + env(safe-area-inset-bottom,0px));right:16px;width:50px;height:50px;border-radius:15px;background:linear-gradient(135deg,#7a5c10,var(--gold),#7a5c10);border:none;color:#1a0f00;font-size:22px;font-weight:bold;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 22px rgba(201,168,76,.4);z-index:90}
+.fab:active{transform:scale(.9)}
+.qcap{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--surface2),var(--surface3));border:1px solid var(--border-strong);border-radius:14px;padding:12px 14px;margin-bottom:14px}
+.qcap input{flex:1;background:none;border:none;color:var(--cream);font-family:'EB Garamond',serif;font-size:15px;outline:none}
+.qcap input::placeholder{color:var(--cream-dim);font-style:italic}
+.qcap button{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--gold);border:1px solid var(--border-strong);background:rgba(201,168,76,.1);padding:7px 12px;border-radius:20px;cursor:pointer;flex-shrink:0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.card-red::before{background:linear-gradient(90deg,transparent,#8b2020,transparent)}
+.card-blue::before{background:linear-gradient(90deg,transparent,#2a5a9e,transparent)}
+.card-green::before{background:linear-gradient(90deg,transparent,#2a7a50,transparent)}
+.card-purple::before{background:linear-gradient(90deg,transparent,#6a3aae,transparent)}
+.card-teal::before{background:linear-gradient(90deg,transparent,#1a7a7a,transparent)}
+.card-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--gold-light);margin-bottom:3px;padding-right:28px}
+.card-meta{font-size:12px;color:var(--cream-dim);font-style:italic;margin-bottom:6px}
+.card-body{font-size:var(--fsc);color:var(--cream);line-height:1.65}
+.card-tag{display:inline-block;background:rgba(201,168,76,.1);border:1px solid var(--gold-dim);color:var(--gold);font-family:'Cinzel',serif;font-size:8px;letter-spacing:.8px;padding:2px 7px;border-radius:20px;margin:3px 3px 0 0;text-transform:uppercase;cursor:pointer}
+.card-tag:active{background:rgba(201,168,76,.25)}
+.card-actions{display:flex;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
+.cbtn{flex:1;padding:6px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--cream-dim);font-size:11px;font-family:'EB Garamond',serif;cursor:pointer;text-align:center;transition:.15s;white-space:nowrap}
+.cbtn:active{background:var(--surface3);color:var(--gold)}
+.cbtn.danger{color:#c44;border-color:rgba(200,60,60,.3)}
+.swrap{position:relative;overflow:hidden;border-radius:var(--radius);margin-bottom:10px}
+.swrap .card{margin-bottom:0;transition:transform .2s ease}
+.sact{position:absolute;top:0;right:0;bottom:0;display:flex;align-items:center;gap:4px;padding:0 10px;opacity:0;pointer-events:none;transition:opacity .15s}
+.sact.show{opacity:1;pointer-events:auto}
+.sabtn{width:46px;height:46px;border-radius:12px;border:none;font-size:18px;cursor:pointer}
+.sa-del{background:rgba(200,60,60,.85)}
+.sa-star{background:rgba(201,168,76,.3);border:1px solid var(--gold-dim)}
+.star-btn{position:absolute;top:12px;right:10px;font-size:16px;cursor:pointer;opacity:.4;transition:opacity .2s;background:none;border:none;padding:4px}
+.star-btn.starred{opacity:1;filter:drop-shadow(0 0 4px #f0c040)}
+@keyframes starPop{0%{transform:scale(1)}40%{transform:scale(1.6)}70%{transform:scale(.9)}100%{transform:scale(1)}}
+.star-btn.pop{animation:starPop .35s ease}
+.pwrap{height:5px;background:var(--surface3);border-radius:3px;margin:8px 0 3px;overflow:hidden}
+.pbar{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:3px}
+.plabel{display:flex;justify-content:space-between;font-family:'Cinzel',serif;font-size:8px;color:var(--gold-dim);letter-spacing:.5px;margin-bottom:4px}
+.pcomp{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden;margin-top:8px}
+.pcomp-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px}
+.fg{margin-bottom:12px}
+.fl{display:block;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:5px}
+.fi,.fs,.fta{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--cream);font-family:'EB Garamond',serif;font-size:15px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--gold-dim);background:var(--surface3)}
+.fta{min-height:90px;resize:vertical;line-height:1.6}
+.fs option{background:var(--surface2)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wclabel{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.8px;color:var(--gold-dim);text-align:right;display:block;margin-top:3px}
+.draft-banner{background:rgba(201,168,76,.1);border:1px solid var(--gold-dim);border-radius:7px;padding:6px 10px;font-size:11px;color:var(--gold);margin-top:6px;text-align:center;font-family:'Cinzel',serif;letter-spacing:1px}
+.btn-p{width:100%;padding:13px;background:linear-gradient(135deg,#7a5c10,var(--gold),#7a5c10);border:none;border-radius:12px;color:#1a0f00;font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(201,168,76,.3)}
+.btn-p:active{transform:scale(.97)}
+@keyframes savePulse{0%{box-shadow:0 4px 16px rgba(201,168,76,.3)}50%{box-shadow:0 4px 30px rgba(201,168,76,.8)}100%{box-shadow:0 4px 16px rgba(201,168,76,.3)}}
+.btn-p.pulse{animation:savePulse .5s ease}
+.btn-s{width:100%;padding:11px;background:transparent;border:1px solid var(--border);border-radius:12px;color:var(--cream-dim);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;cursor:pointer;margin-top:7px}
+.btn-s:active{background:var(--surface2)}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(5px);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.mo.open{display:flex;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));width:100%;max-height:92vh;overflow-y:auto;animation:slideUp .28s cubic-bezier(.34,1.4,.64,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.m-handle{width:38px;height:3px;background:var(--border-strong);border-radius:2px;margin:0 auto 16px}
+.m-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--gold-light);margin-bottom:16px;text-align:center}
+.m-sub{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;text-align:center;margin-top:-12px;margin-bottom:14px}
+.link-item{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:8px 10px;margin-bottom:6px}
+.link-title{font-size:13px;color:var(--cream);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.link-url{font-size:11px;color:var(--cream-dim);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px}
+.link-del{color:#c44;font-size:14px;cursor:pointer;background:none;border:none;padding:2px 6px}
+.link-chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px 3px 6px;font-size:11px;color:var(--cream-dim);margin:3px 3px 0 0;cursor:pointer;text-decoration:none}
+.xref-panel{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px;margin-top:8px}
+.xref-title{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px}
+.xref-chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface3);border:1px solid var(--border);border-radius:20px;padding:3px 8px;font-size:11px;color:var(--cream-dim);margin:2px;cursor:pointer}
+.xref-rem{color:#c44;margin-left:2px;font-size:10px}
+.xref-si{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);margin-bottom:5px;cursor:pointer}
+.xref-si:active{border-color:var(--gold-dim);background:var(--surface3)}
+.sbar{display:flex;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:9px 13px;gap:8px;margin-bottom:12px}
+.sbar input{flex:1;background:none;border:none;color:var(--cream);font-family:'EB Garamond',serif;font-size:15px;outline:none}
+.sbar input::placeholder{color:var(--cream-dim)}
+.sicon{color:var(--gold-dim);font-size:14px}
+.pills{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px;margin-bottom:12px;scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex-shrink:0;padding:4px 13px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--cream-dim);font-family:'Cinzel',serif;font-size:8px;letter-spacing:.9px;cursor:pointer;text-transform:uppercase;white-space:nowrap}
+.pill.active{background:rgba(201,168,76,.18);border-color:var(--gold-dim);color:var(--gold)}
+.sort-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sort-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;color:var(--gold-dim);white-space:nowrap}
+.sort-sel{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--cream-dim);font-family:'Cinzel',serif;font-size:9px;outline:none;-webkit-appearance:none}
+.shdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:7px 0;border-top:1px solid var(--border)}
+.stitle{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase}
+.scount{background:rgba(201,168,76,.13);color:var(--gold);font-family:'Cinzel',serif;font-size:9px;padding:2px 8px;border-radius:20px;border:1px solid var(--gold-dim)}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:12px;text-align:center}
+.snum{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--gold-light);line-height:1;margin-bottom:3px}
+.slabel{font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--gold-dim);text-transform:uppercase}
+.cbox{background:var(--surface2);border-left:3px solid var(--gold-dim);border-radius:0 8px 8px 0;padding:9px 13px;margin:7px 0;font-style:italic;font-size:13px;color:var(--cream);line-height:1.7}
+.cref{font-style:normal;font-size:11px;color:var(--gold);margin-top:3px;font-family:'Cinzel',serif;letter-spacing:.4px}
+.streak-bar{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--surface2),var(--surface3));border:1px solid var(--border-strong);border-radius:16px;padding:18px 20px;margin-bottom:14px;cursor:pointer;position:relative;overflow:hidden}
+.streak-bar::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(201,168,76,.07),transparent 70%);pointer-events:none}
+.streak-fire{font-size:38px;filter:drop-shadow(0 0 10px rgba(255,140,0,.5))}
+.streak-num{font-family:'Playfair Display',serif;font-size:46px;font-weight:700;color:var(--gold-light);line-height:1}
+.streak-info{flex:1}
+.streak-days{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase}
+.streak-sub{font-family:'EB Garamond',serif;font-size:14px;color:var(--cream-dim);margin-top:4px;font-style:italic}
+.streak-log-btn{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;color:var(--gold);border:1px solid var(--border-strong);background:rgba(201,168,76,.1);padding:9px 14px;border-radius:24px;cursor:pointer;white-space:nowrap}
+.streak-dots{display:flex;gap:5px;margin-top:10px}
+.sdot{width:10px;height:10px;border-radius:50%;background:var(--surface3);border:1px solid var(--border)}
+.sdot.done{background:var(--gold);border-color:var(--gold);box-shadow:0 0 6px var(--gold)}
+.sdot.today{background:transparent;border-color:var(--gold-light);border-width:2px}
+.vod{background:linear-gradient(135deg,#101820,#1d2a38);border:1px solid var(--border-strong);border-radius:var(--radius);padding:24px 22px;margin-bottom:14px;position:relative;overflow:hidden}
+.vod::before{content:'\201C';position:absolute;top:-18px;left:10px;font-size:140px;color:rgba(201,168,76,.07);font-family:'Playfair Display',serif;line-height:1;pointer-events:none}
+.vod-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.vod-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--gold-dim),transparent)}
+.vod-text{font-family:'Playfair Display',serif;font-size:22px;font-style:italic;color:var(--cream);line-height:1.65;margin-bottom:16px}
+.vod-ref{font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase}
+.vod-ref::before{content:'\2014  ';color:var(--gold-dim)}
+#tw{position:fixed;bottom:calc(var(--nav-h)+80px + env(safe-area-inset-bottom,0px));left:16px;background:linear-gradient(135deg,var(--surface2),var(--surface3));border:1px solid var(--border-strong);border-radius:16px;padding:12px 16px;display:none;align-items:center;gap:12px;z-index:89;box-shadow:0 8px 30px rgba(0,0,0,.5);cursor:pointer}
+#tw.active{display:flex}
+.tw-book{font-family:'Playfair Display',serif;font-size:12px;color:var(--gold-light);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tw-time{font-family:'Cinzel',serif;font-size:14px;letter-spacing:2px;color:var(--gold);font-weight:600}
+.tw-stop{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;color:var(--cream-dim);border:1px solid var(--border);background:none;padding:4px 10px;border-radius:20px;cursor:pointer}
+.proj-card{border-radius:var(--radius);padding:14px;margin-bottom:10px;position:relative;overflow:hidden;cursor:pointer;border:1px solid}
+.proj-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:3px}
+.proj-meta{font-size:12px;font-style:italic;margin-bottom:8px}
+.proj-stats{display:flex;gap:8px;flex-wrap:wrap}
+.pstat{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:20px;border:1px solid}
+.rv-badge{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px}
+.rv-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--gold-light);line-height:1.3;margin-bottom:6px}
+.rv-meta{font-size:13px;color:var(--cream-dim);font-style:italic;margin-bottom:12px}
+.rv-content{font-family:'EB Garamond',serif;font-size:var(--fsc);color:var(--cream);line-height:1.8}
+.rv-content h1,.rv-content h2{font-family:'Playfair Display',serif;color:var(--gold-light);margin:14px 0 6px}
+.rv-content h1{font-size:20px}.rv-content h2{font-size:17px}
+.rv-content h3{font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin:12px 0 6px}
+.rv-content strong{color:var(--gold-light);font-weight:600}
+.rv-content em{font-style:italic;color:var(--cream-dim)}
+.rv-content ul,.rv-content ol{margin:8px 0 8px 20px}
+.rv-content li{margin-bottom:4px}
+.rv-content blockquote{border-left:3px solid var(--gold-dim);padding:8px 14px;margin:10px 0;background:var(--surface2);border-radius:0 8px 8px 0;font-style:italic}
+.rv-content p{margin-bottom:10px}
+.rv-actions{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.rv-btn{flex:1;min-width:56px;padding:9px 5px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--cream-dim);font-size:11px;font-family:'EB Garamond',serif;cursor:pointer;text-align:center;white-space:nowrap}
+.rv-btn:active{background:var(--surface3);color:var(--gold)}
+.related-sec{margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.cfbox{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;position:relative}
+.cfstyle{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+.cftext{font-family:'EB Garamond',serif;font-size:14px;color:var(--cream);line-height:1.7;padding-right:36px}
+.cfcopy{position:absolute;top:10px;right:10px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--gold-dim);font-size:13px;padding:4px 8px;cursor:pointer}
+.tag-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);margin-bottom:6px}
+.tag-name{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.8px;color:var(--gold);text-transform:uppercase;cursor:pointer;flex:1}
+.tag-count{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold-light)}
+.tag-rename-area{background:var(--surface2);border:1px solid var(--border-strong);border-radius:10px;padding:12px;margin-bottom:10px}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.set-label{font-family:'Playfair Display',serif;font-size:15px;color:var(--cream)}
+.set-sub{font-size:12px;color:var(--cream-dim);font-style:italic;margin-top:2px}
+.toggle{width:48px;height:28px;border-radius:14px;background:var(--surface3);border:1px solid var(--border);cursor:pointer;position:relative}
+.toggle.on{background:var(--gold-dim)}
+.toggle-k{width:22px;height:22px;border-radius:50%;background:var(--cream-dim);position:absolute;top:2px;left:3px;transition:transform .2s}
+.toggle.on .toggle-k{transform:translateX(20px);background:var(--gold-light)}
+.fsize-btns{display:flex;gap:6px}
+.fsize-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--cream-dim);font-family:'Cinzel',serif;font-size:9px;cursor:pointer}
+.fsize-btn.active{background:rgba(201,168,76,.18);border-color:var(--gold-dim);color:var(--gold)}
+.log-entry{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)}
+.log-date{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--gold-dim);min-width:36px;margin-top:2px}
+.log-text{font-size:13px;color:var(--cream);line-height:1.5;flex:1}
+.log-mins{font-family:'Cinzel',serif;font-size:8px;color:var(--cream-dim);margin-top:3px}
+.swatch-row{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{width:28px;height:28px;border-radius:8px;cursor:pointer;border:2px solid transparent}
+.swatch.sel{border-color:var(--gold-light);transform:scale(1.15)}
+.edit-ind{background:rgba(201,168,76,.09);border:1px solid var(--gold-dim);border-radius:7px;padding:6px 10px;font-size:11px;color:var(--gold);margin-bottom:10px;text-align:center;font-family:'Cinzel',serif;letter-spacing:1px}
+.sb{display:inline-block;padding:2px 9px;border-radius:20px;font-family:'Cinzel',serif;font-size:7px;letter-spacing:.9px;text-transform:uppercase;margin-bottom:5px}
+.sb-reading{background:rgba(30,58,110,.3);color:#6a9fd4;border:1px solid rgba(30,58,110,.5)}
+.sb-complete{background:rgba(26,82,48,.3);color:#5dac82;border:1px solid rgba(26,82,48,.5)}
+.sb-queued{background:rgba(61,26,110,.3);color:#a06dd4;border:1px solid rgba(61,26,110,.5)}
+.sb-paused{background:rgba(139,32,32,.3);color:#d46d6d;border:1px solid rgba(139,32,32,.5)}
+#toast{position:fixed;bottom:calc(var(--nav-h)+78px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--border-strong);border-radius:12px;padding:9px 18px;font-family:'EB Garamond',serif;font-size:14px;color:var(--gold-light);z-index:500;opacity:0;transition:opacity .28s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+#fse{position:fixed;inset:0;background:var(--bg);z-index:400;display:none;flex-direction:column}
+#fse.open{display:flex}
+.fse-hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:max(env(safe-area-inset-top),14px) 16px 12px;display:flex;align-items:center;gap:10px}
+.fse-ti{flex:1;background:none;border:none;color:var(--gold-light);font-family:'Playfair Display',serif;font-size:18px;font-weight:600;outline:none}
+.fse-ti::placeholder{color:var(--gold-dim)}
+.fse-close{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;color:var(--gold);border:1px solid var(--border-strong);background:rgba(201,168,76,.1);padding:8px 14px;border-radius:20px;cursor:pointer}
+.fse-body{flex:1;padding:16px;overflow:hidden;display:flex;flex-direction:column;gap:8px;min-height:0}
+.fse-ta{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;color:var(--cream);font-family:'EB Garamond',serif;font-size:var(--fsc);line-height:1.8;outline:none;resize:none;-webkit-appearance:none}
+.fse-ta:focus{border-color:var(--gold-dim)}
+.fse-preview{flex:1;background:var(--surface2);border:1px solid var(--gold-dim);border-radius:12px;padding:16px;overflow-y:auto;display:none}
+.fse-ft{display:flex;align-items:center;justify-content:space-between;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--border)}
+.fse-wc{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--gold-dim)}
+.fse-save{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;color:#1a0f00;background:linear-gradient(135deg,#7a5c10,var(--gold));border:none;padding:10px 20px;border-radius:20px;cursor:pointer}
+.bulk-bar{display:none;position:sticky;bottom:0;left:0;right:0;background:linear-gradient(135deg,var(--surface2),var(--surface3));border:1px solid var(--border-strong);border-radius:14px 14px 0 0;padding:10px 16px;align-items:center;gap:10px;z-index:50}
+.empty{text-align:center;padding:40px 20px;color:var(--cream-dim)}
+.ei{font-size:40px;margin-bottom:10px;opacity:.35}
+.et{font-family:'Playfair Display',serif;font-size:17px;color:var(--cream-dim);margin-bottom:5px}
+.es{font-size:12px;line-height:1.6;opacity:.7}
+mark{background:rgba(201,168,76,.3);color:var(--gold-light);border-radius:2px;padding:0 2px}
+.ibid-note{background:rgba(201,168,76,.08);border:1px solid var(--gold-dim);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--gold)}
+.proj-scratch{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px}
+.proj-scratch-title{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px}
+#tabConflict{display:none;position:fixed;top:0;left:0;right:0;background:#8b2020;color:#f0e8d5;font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-align:center;padding:8px;z-index:999;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="tabConflict" onclick="location.reload()">⚠ Codex open in another tab — changes may conflict. Tap to reload.</div>
+<div id="app">
+<!-- HEADER -->
+<div class="header">
+  <div class="hl"><div class="hw">Codex · Research</div><div class="hs" id="hSection">Home</div></div>
+  <div style="display:flex;gap:5px">
+    <button class="hbtn" onclick="openTagBrowser()">🏷</button>
+    <button class="hbtn" onclick="openSearch()">🔍</button>
+    <button class="hbtn" onclick="openStats()">📊</button>
+    <button class="hbtn" onclick="openSettings()">⚙️</button>
+  </div>
+</div>
+<!-- PAGES -->
+<div id="pages">
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="qcap"><span style="font-size:18px">✍️</span><input id="qcInput" placeholder="Capture a quick thought…" spellcheck="true" onkeydown="if(event.key==='Enter')saveQuickCapture()"><button onclick="saveQuickCapture()">Capture</button></div>
+    <div class="streak-bar" onclick="openLog()">
+      <div class="streak-fire">🔥</div>
+      <div class="streak-info">
+        <div style="display:flex;align-items:baseline;gap:6px"><div class="streak-num" id="streakNum">0</div><div class="streak-days">day streak</div></div>
+        <div class="streak-sub" id="streakSub">Log today's research to begin</div>
+        <div class="streak-dots" id="streakDots"></div>
+      </div>
+      <button class="streak-log-btn" onclick="event.stopPropagation();openLogEntry()">+ Log</button>
+    </div>
+    <div class="vod">
+      <div class="vod-label">✦ Quote of the Day</div>
+      <div class="vod-text" id="vodText">…</div>
+      <div class="vod-ref" id="vodRef"></div>
+    </div>
+    <div class="sgrid">
+      <div class="scard"><div class="snum" id="stBooks">0</div><div class="slabel">Books</div></div>
+      <div class="scard"><div class="snum" id="stNotes">0</div><div class="slabel">Notes</div></div>
+      <div class="scard"><div class="snum" id="stIdeas">0</div><div class="slabel">Ideas</div></div>
+      <div class="scard"><div class="snum" id="stCites">0</div><div class="slabel">Citations</div></div>
+    </div>
+    <div class="shdr"><span class="stitle">✦ Starred</span><span class="scount" id="starCount">0</span></div>
+    <div id="starredList"></div>
+    <div class="shdr">
+      <span class="stitle">✦ Recent Activity</span>
+      <select class="sort-sel" id="homeSort" onchange="renderHome()" style="width:auto;font-size:8px;padding:4px 8px">
+        <option value="updated">Recent</option>
+        <option value="starred">Starred First</option>
+        <option value="book">Books</option>
+        <option value="note">Notes</option>
+        <option value="idea">Ideas</option>
+        <option value="citation">Citations</option>
+      </select>
+    </div>
+    <div id="recentList"></div>
+  </div>
+  <!-- LIBRARY -->
+  <div class="page" id="page-library">
+    <div class="sbar"><span class="sicon">🔍</span><input type="text" placeholder="Search library…" id="libQ" oninput="renderLibrary()"></div>
+    <div class="pills">
+      <div class="pill active" onclick="setFilter('lib','all',this)">All</div>
+      <div class="pill" onclick="setFilter('lib','reading',this)">Reading</div>
+      <div class="pill" onclick="setFilter('lib','complete',this)">Complete</div>
+      <div class="pill" onclick="setFilter('lib','queued',this)">Queued</div>
+      <div class="pill" onclick="setFilter('lib','paused',this)">Paused</div>
+      <div class="pill" onclick="setFilter('lib','starred',this)">★ Starred</div>
+    </div>
+    <div class="sort-row"><span class="sort-label">Sort:</span><select class="sort-sel" id="libSort" onchange="renderLibrary()"><option value="updated">Recently Updated</option><option value="created">Date Added</option><option value="title">Title A–Z</option><option value="starred">Starred First</option></select></div>
+    <div class="shdr"><span class="stitle">✦ My Library</span><span class="scount" id="libCnt">0</span></div>
+    <div id="libraryList"></div>
+  </div>
+  <!-- NOTES -->
+  <div class="page" id="page-notes">
+    <div class="sbar"><span class="sicon">🔍</span><input type="text" placeholder="Search notes…" id="noteQ" oninput="renderNotes()"></div>
+    <div class="pills">
+      <div class="pill active" onclick="setFilter('note','all',this)">All</div>
+      <div class="pill" onclick="setFilter('note','analysis',this)">Analysis</div>
+      <div class="pill" onclick="setFilter('note','summary',this)">Summary</div>
+      <div class="pill" onclick="setFilter('note','critique',this)">Critique</div>
+      <div class="pill" onclick="setFilter('note','reflection',this)">Reflection</div>
+      <div class="pill" onclick="setFilter('note','starred',this)">★ Starred</div>
+    </div>
+    <div class="sort-row"><span class="sort-label">Sort:</span><select class="sort-sel" id="noteSort" onchange="renderNotes()"><option value="updated">Recently Updated</option><option value="created">Date Added</option><option value="title">Title A–Z</option><option value="starred">Starred First</option></select></div>
+    <div class="shdr"><span class="stitle">✦ Study Notes</span><div style="display:flex;align-items:center;gap:8px"><button class="cbtn" style="flex:0;padding:2px 8px;font-size:9px" id="noteSelBtn" onclick="toggleSelectMode('note')">☑ Select</button><span class="scount" id="noteCnt">0</span></div></div>
+    <div id="notesList"></div>
+    <div class="bulk-bar" id="noteBulkBar"><span class="stitle bulk-count" style="flex:1">0 selected</span><button class="cbtn" style="flex:0;padding:6px 12px" onclick="openBulkOps()">⚡ Actions</button><button class="cbtn" style="flex:0;padding:6px 12px" onclick="clearSelection()">✕</button></div>
+  </div>
+  <!-- IDEAS -->
+  <div class="page" id="page-ideas">
+    <div class="sbar"><span class="sicon">🔍</span><input type="text" placeholder="Search ideas…" id="ideaQ" oninput="renderIdeas()"></div>
+    <div class="pills">
+      <div class="pill active" onclick="setFilter('idea','all',this)">All</div>
+      <div class="pill" onclick="setFilter('idea','high',this)">⚡ High</div>
+      <div class="pill" onclick="setFilter('idea','medium',this)">◆ Medium</div>
+      <div class="pill" onclick="setFilter('idea','low',this)">◇ Low</div>
+      <div class="pill" onclick="setFilter('idea','starred',this)">★ Starred</div>
+    </div>
+    <div class="sort-row"><span class="sort-label">Sort:</span><select class="sort-sel" id="ideaSort" onchange="renderIdeas()"><option value="updated">Recently Updated</option><option value="title">Title A–Z</option><option value="starred">Starred First</option><option value="priority">Priority</option></select></div>
+    <div class="shdr"><span class="stitle">✦ Ideas &amp; Insights</span><div style="display:flex;align-items:center;gap:8px"><button class="cbtn" style="flex:0;padding:2px 8px;font-size:9px" id="ideaSelBtn" onclick="toggleSelectMode('idea')">☑ Select</button><span class="scount" id="ideaCnt">0</span></div></div>
+    <div id="ideasList"></div>
+    <div class="bulk-bar" id="ideaBulkBar"><span class="stitle bulk-count" style="flex:1">0 selected</span><button class="cbtn" style="flex:0;padding:6px 12px" onclick="openBulkOps()">⚡ Actions</button><button class="cbtn" style="flex:0;padding:6px 12px" onclick="clearSelection()">✕</button></div>
+  </div>
+  <!-- CITATIONS -->
+  <div class="page" id="page-citations">
+    <div class="sbar"><span class="sicon">🔍</span><input type="text" placeholder="Search citations…" id="citeQ" oninput="renderCitations()"></div>
+    <div class="pills">
+      <div class="pill active" onclick="setFilter('cite','all',this)">All</div>
+      <div class="pill" onclick="setFilter('cite','book',this)">Book</div>
+      <div class="pill" onclick="setFilter('cite','journal',this)">Journal</div>
+      <div class="pill" onclick="setFilter('cite','primary',this)">Primary</div>
+      <div class="pill" onclick="setFilter('cite','web',this)">Web</div>
+      <div class="pill" onclick="setFilter('cite','starred',this)">★ Starred</div>
+    </div>
+    <div class="sort-row"><span class="sort-label">Sort:</span><select class="sort-sel" id="citeSort" onchange="renderCitations()"><option value="updated">Recently Updated</option><option value="created">Date Added</option><option value="starred">Starred First</option></select></div>
+    <div class="shdr"><span class="stitle">✦ Citations</span><div style="display:flex;align-items:center;gap:8px"><button class="cbtn" style="flex:0;padding:2px 8px;font-size:9px" id="citeSelBtn" onclick="toggleSelectMode('cite')">☑ Select</button><span class="scount" id="citeCnt">0</span></div></div>
+    <div id="citationsList"></div>
+    <div class="bulk-bar" id="citeBulkBar"><span class="stitle bulk-count" style="flex:1">0 selected</span><button class="cbtn" style="flex:0;padding:6px 12px" onclick="openBulkOps()">⚡ Actions</button><button class="cbtn" style="flex:0;padding:6px 12px" onclick="clearSelection()">✕</button></div>
+  </div>
+  <!-- PROJECTS -->
+  <div class="page" id="page-projects">
+    <div class="sbar"><span class="sicon">🔍</span><input type="text" placeholder="Search projects…" id="projQ" oninput="renderProjects()"></div>
+    <div class="shdr"><span class="stitle">✦ Research Projects</span><span class="scount" id="projCnt">0</span></div>
+    <div id="projectsList"></div>
+  </div>
+</div>
+<!-- NAV -->
+<div class="nav">
+  <div class="ni active" id="ni-home" onclick="nav('home')"><div class="ni-icon">🏛</div><div class="ni-label">Home</div><div class="ni-dot"></div></div>
+  <div class="ni" id="ni-library" onclick="nav('library')"><div class="ni-icon">📚</div><div class="ni-label">Library</div><div class="ni-dot"></div></div>
+  <div class="ni" id="ni-notes" onclick="nav('notes')"><div class="ni-icon">📜</div><div class="ni-label">Notes</div><div class="ni-dot"></div></div>
+  <div class="ni" id="ni-ideas" onclick="nav('ideas')"><div class="ni-icon">💡</div><div class="ni-label">Ideas</div><div class="ni-dot"></div></div>
+  <div class="ni" id="ni-citations" onclick="nav('citations')"><div class="ni-icon">✒</div><div class="ni-label">Cite</div><div class="ni-dot"></div></div>
+  <div class="ni" id="ni-projects" onclick="nav('projects')"><div class="ni-icon">🗂</div><div class="ni-label">Projects</div><div class="ni-dot"></div></div>
+</div>
+</div>
+<button class="fab" onclick="fabAction()">+</button>
+<div id="toast"></div>
+<!-- TIMER WIDGET -->
+<div id="tw" onclick="openM('mo-timer')">
+  <span style="font-size:20px">⏱</span>
+  <div><div class="tw-book" id="twBook">—</div><div class="tw-time" id="twTime">00:00</div></div>
+  <button class="tw-stop" onclick="event.stopPropagation();stopTimer()">Stop</button>
+</div>
+<!-- FULLSCREEN EDITOR -->
+<div id="fse">
+  <div class="fse-hdr">
+    <input class="fse-ti" id="fseTitle" placeholder="Note title…" spellcheck="true">
+    <button class="fse-close" onclick="closeFSE()">Done ✓</button>
+  </div>
+  <div class="fse-body">
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="cbtn" style="flex:0;padding:5px 10px;font-size:13px" onclick="insertMd('**','**')"><b>B</b></button>
+      <button class="cbtn" style="flex:0;padding:5px 10px;font-size:13px" onclick="insertMd('*','*')"><i>I</i></button>
+      <button class="cbtn" style="flex:0;padding:5px 10px;font-size:12px" onclick="insertMd('## ','')">H2</button>
+      <button class="cbtn" style="flex:0;padding:5px 10px;font-size:12px" onclick="insertMd('### ','')">H3</button>
+      <button class="cbtn" style="flex:0;padding:5px 10px;font-size:12px" onclick="insertMd('- ','')">• List</button>
+      <button class="cbtn" style="flex:0;padding:5px 10px;font-size:12px" onclick="insertMd('> ','')">❝</button>
+      <button class="cbtn" style="flex:0;padding:5px 10px;font-size:12px;margin-left:auto" id="fsePreviewBtn" onclick="toggleFsePreview()">👁 Preview</button>
+    </div>
+    <textarea class="fse-ta" spellcheck="true" id="fseContent" placeholder="Write here… **bold**, *italic*, ## heading, - list, > quote" oninput="updateFseWc()"></textarea>
+    <div class="fse-preview rv-content" id="fsePreview"></div>
+  </div>
+  <div class="fse-ft">
+    <span class="fse-wc" id="fseWc">0 words</span>
+    <button class="fse-save" onclick="closeFSE()">Save &amp; Close</button>
+  </div>
+</div>
+
+<!-- READ VIEW -->
+<div class="mo" id="mo-read"><div class="modal"><div class="m-handle"></div><div id="readContent"></div><button class="btn-s" onclick="closeM('mo-read')">Close</button></div></div>
+<!-- CITATION FORMATTER -->
+<div class="mo" id="mo-citefmt"><div class="modal"><div class="m-handle"></div><div class="m-title">Citation Formats</div><div id="citeFmtContent"></div><button class="btn-s" onclick="closeM('mo-citefmt')">Close</button></div></div>
+<!-- TIMER MODAL -->
+<div class="mo" id="mo-timer">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title" id="timerBookName">Reading Timer</div>
+    <div style="text-align:center;font-family:'Playfair Display',serif;font-size:56px;color:var(--gold-light);letter-spacing:4px;padding:20px 0" id="timerDisplay">00:00</div>
+    <div style="text-align:center;font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--gold-dim);margin-bottom:20px" id="timerStatus">RUNNING</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-s" style="flex:1;margin-top:0" id="timerPauseBtn" onclick="toggleTimerPause()">⏸ Pause</button>
+      <button class="btn-s" style="flex:1;margin-top:0;color:#c44" onclick="stopTimer();closeM('mo-timer')">■ Stop &amp; Log</button>
+    </div>
+    <button class="btn-s" onclick="closeM('mo-timer')">Close</button>
+  </div>
+</div>
+<!-- BOOK MODAL -->
+<div class="mo" id="mo-book">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title" id="bookMTitle">Add to Library</div>
+    <div class="edit-ind" id="bookEditInd" style="display:none">✦ Editing Book</div>
+    <input type="hidden" id="bId">
+    <div class="fg"><label class="fl">Title</label><input class="fi" id="bTitle" placeholder="Book title…" spellcheck="true"></div>
+    <div class="fg"><label class="fl">Author</label><input class="fi" id="bAuthor" placeholder="Author name(s)"></div>
+    <div class="fg"><label class="fl">ISBN</label><input class="fi" id="bISBN" placeholder="e.g. 978-0-06-112008-4"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Category</label>
+        <select class="fs" id="bCat">
+          <option value="primary">Primary Source</option><option value="secondary">Secondary</option>
+          <option value="academic">Academic</option><option value="biography">Biography</option>
+          <option value="historical">Historical</option><option value="scientific">Scientific</option>
+          <option value="literary">Literary</option><option value="reference">Reference</option><option value="other">Other</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Status</label>
+        <select class="fs" id="bStatus">
+          <option value="queued">Queued</option><option value="reading">Reading</option>
+          <option value="complete">Complete</option><option value="paused">Paused</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Pages Read</label><input class="fi" id="bPR" type="number" placeholder="0"></div>
+      <div class="fg"><label class="fl">Total Pages</label><input class="fi" id="bPT" type="number" placeholder="0"></div>
+    </div>
+    <div class="fg"><label class="fl">Project</label><select class="fs" id="bProj"><option value="">— None —</option></select></div>
+    <div class="fg"><label class="fl">Notes</label><textarea class="fta" spellcheck="true" id="bNotes" placeholder="Notes on this book…" style="min-height:80px"></textarea></div>
+    <div class="fg">
+      <label class="fl">Links &amp; Resources</label>
+      <div id="bLinkList"></div>
+      <div style="display:flex;gap:6px;margin-top:5px">
+        <input class="fi" id="bLinkTitle" placeholder="Title" style="flex:1">
+        <input class="fi" id="bLinkUrl" placeholder="URL or path" style="flex:2">
+        <button class="cbtn" onclick="addLink('b')" style="flex-shrink:0;padding:0 10px">+</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">Cross-References</label>
+      <div id="bXrefList"></div>
+      <button class="btn-s" style="margin-top:5px;font-size:9px;padding:8px" onclick="openXref('b')">+ Link to Entry</button>
+    </div>
+    <button class="btn-p" id="bookSaveBtn" onclick="saveBook()">Save Book</button>
+    <button class="btn-s" onclick="closeM('mo-book')">Cancel</button>
+  </div>
+</div>
+<!-- NOTE MODAL -->
+<div class="mo" id="mo-note">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title" id="noteMTitle">New Study Note</div>
+    <div class="edit-ind" id="noteEditInd" style="display:none">✦ Editing Note</div>
+    <input type="hidden" id="nId">
+    <div class="fg"><label class="fl">Title</label><input class="fi" id="nTitle" placeholder="Note title…" spellcheck="true"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Type</label>
+        <select class="fs" id="nType">
+          <option value="analysis">Analysis</option><option value="summary">Summary</option>
+          <option value="critique">Critique</option><option value="reflection">Reflection</option>
+          <option value="methodology">Methodology</option><option value="other">Other</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Reference / Source</label><input class="fi" id="nRef" placeholder="e.g. Smith 2019, p.42"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Book</label><select class="fs" id="nBook"><option value="">— None —</option></select></div>
+      <div class="fg"><label class="fl">Project</label><select class="fs" id="nProj"><option value="">— None —</option></select></div>
+    </div>
+    <div class="fg">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+        <label class="fl" style="margin:0">Content</label>
+        <button class="cbtn" style="flex:0;padding:3px 10px;font-size:10px" onclick="openFSE()">⛶ Expand</button>
+      </div>
+      <textarea class="fta" spellcheck="true" id="nContent" placeholder="Your notes… **bold**, *italic*, ## headings, - lists" style="min-height:220px" oninput="updateNoteWc();autosaveDraft()"></textarea>
+      <span class="wclabel" id="noteWc">0 words</span>
+      <div id="draftBanner" class="draft-banner" style="display:none">📄 Draft restored — review before saving</div>
+    </div>
+    <div class="fg"><label class="fl">Tags (comma separated)</label><input class="fi" id="nTags" placeholder="e.g. epistemology, paradigm shift, methodology"></div>
+    <div class="fg">
+      <label class="fl">Links &amp; Resources</label>
+      <div id="nLinkList"></div>
+      <div style="display:flex;gap:6px;margin-top:5px">
+        <input class="fi" id="nLinkTitle" placeholder="Title" style="flex:1">
+        <input class="fi" id="nLinkUrl" placeholder="URL or path" style="flex:2">
+        <button class="cbtn" onclick="addLink('n')" style="flex-shrink:0;padding:0 10px">+</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">Cross-References</label>
+      <div id="nXrefList"></div>
+      <button class="btn-s" style="margin-top:5px;font-size:9px;padding:8px" onclick="openXref('n')">+ Link to Entry</button>
+    </div>
+    <button class="btn-p" id="noteSaveBtn" onclick="saveNote()">Save Note</button>
+    <button class="btn-s" onclick="closeM('mo-note')">Cancel</button>
+  </div>
+</div>
+<!-- IDEA MODAL -->
+<div class="mo" id="mo-idea">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title" id="ideaMTitle">Capture Idea</div>
+    <div class="edit-ind" id="ideaEditInd" style="display:none">✦ Editing Idea</div>
+    <input type="hidden" id="iId">
+    <div class="fg"><label class="fl">Idea / Question</label><input class="fi" id="iTitle" placeholder="What's the hypothesis, question, or insight?" spellcheck="true"></div>
+    <div class="fg"><label class="fl">Elaboration</label><textarea class="fta" spellcheck="true" id="iContent" placeholder="Develop the thought — connections, implications, research directions…" style="min-height:100px"></textarea></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Related Reference</label><input class="fi" id="iRef" placeholder="e.g. Smith 2019, p.87"></div>
+      <div class="fg"><label class="fl">Priority</label>
+        <select class="fs" id="iPri">
+          <option value="high">⚡ High</option><option value="medium" selected>◆ Medium</option><option value="low">◇ Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Project</label><select class="fs" id="iProj"><option value="">— None —</option></select></div>
+    <div class="fg"><label class="fl">Tags (comma separated)</label><input class="fi" id="iTags" placeholder="e.g. hypothesis, theory, empirical"></div>
+    <div class="fg">
+      <label class="fl">Links &amp; Resources</label>
+      <div id="iLinkList"></div>
+      <div style="display:flex;gap:6px;margin-top:5px">
+        <input class="fi" id="iLinkTitle" placeholder="Title" style="flex:1">
+        <input class="fi" id="iLinkUrl" placeholder="URL or path" style="flex:2">
+        <button class="cbtn" onclick="addLink('i')" style="flex-shrink:0;padding:0 10px">+</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">Cross-References</label>
+      <div id="iXrefList"></div>
+      <button class="btn-s" style="margin-top:5px;font-size:9px;padding:8px" onclick="openXref('i')">+ Link to Entry</button>
+    </div>
+    <button class="btn-p" onclick="saveIdea()">Save Idea</button>
+    <button class="btn-s" onclick="closeM('mo-idea')">Cancel</button>
+  </div>
+</div>
+<!-- CITATION MODAL -->
+<div class="mo" id="mo-cite">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title" id="citeMTitle">Add Citation</div>
+    <div class="edit-ind" id="citeEditInd" style="display:none">✦ Editing Citation</div>
+    <input type="hidden" id="cId">
+    <div class="fg"><label class="fl">Quote / Passage</label><textarea class="fta" spellcheck="true" id="cQuote" placeholder="The exact text being cited…" style="min-height:80px"></textarea></div>
+    <div class="fg"><label class="fl">Reference / Location</label><input class="fi" id="cRef" placeholder="e.g. Smith (2019, p. 42) or Vol. II, Ch. 4"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Source Type</label>
+        <select class="fs" id="cType">
+          <option value="book">Book</option><option value="journal">Journal Article</option>
+          <option value="primary">Primary Source</option><option value="web">Web / Online</option>
+          <option value="interview">Interview</option><option value="other">Other</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Edition / Version</label><input class="fi" id="cTrans" placeholder="e.g. 2nd ed., rev. 2020"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Author(s)</label><input class="fi" id="cAuthor" placeholder="e.g. Smith, J."></div>
+      <div class="fg"><label class="fl">Year</label><input class="fi" id="cYear" type="number" placeholder="e.g. 2019"></div>
+    </div>
+    <div class="fg"><label class="fl">Publication / Journal</label><input class="fi" id="cPub" placeholder="e.g. Harvard University Press"></div>
+    <div class="fg"><label class="fl">DOI / URL</label><input class="fi" id="cDoi" placeholder="e.g. 10.1000/xyz123 or https://…"></div>
+    <div class="fg"><label class="fl">Project</label><select class="fs" id="cProj"><option value="">— None —</option></select></div>
+    <div class="fg"><label class="fl">My Commentary</label><textarea class="fta" spellcheck="true" id="cComm" placeholder="Why this matters, connections…" style="min-height:65px"></textarea></div>
+    <div class="fg"><label class="fl">Tags (comma separated)</label><input class="fi" id="cTags" placeholder="e.g. methodology, theory, evidence"></div>
+    <div class="fg">
+      <label class="fl">Links &amp; Resources</label>
+      <div id="cLinkList"></div>
+      <div style="display:flex;gap:6px;margin-top:5px">
+        <input class="fi" id="cLinkTitle" placeholder="Title" style="flex:1">
+        <input class="fi" id="cLinkUrl" placeholder="URL or path" style="flex:2">
+        <button class="cbtn" onclick="addLink('c')" style="flex-shrink:0;padding:0 10px">+</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">Cross-References</label>
+      <div id="cXrefList"></div>
+      <button class="btn-s" style="margin-top:5px;font-size:9px;padding:8px" onclick="openXref('c')">+ Link to Entry</button>
+    </div>
+    <button class="btn-p" onclick="saveCite()">Save Citation</button>
+    <button class="btn-s" onclick="closeM('mo-cite')">Cancel</button>
+  </div>
+</div>
+<!-- PROJECT MODAL -->
+<div class="mo" id="mo-proj">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title" id="projMTitle">New Research Project</div>
+    <div class="edit-ind" id="projEditInd" style="display:none">✦ Editing Project</div>
+    <input type="hidden" id="pjId">
+    <div class="fg"><label class="fl">Project Name</label><input class="fi" id="pjName" placeholder="e.g. WWII Origins, Climate Policy, Kant's Ethics" spellcheck="true"></div>
+    <div class="fg"><label class="fl">Description</label><textarea class="fta" spellcheck="true" id="pjDesc" placeholder="What this research project is about…" style="min-height:70px"></textarea></div>
+    <div class="fg"><label class="fl">Research Focus / Key Topics</label><input class="fi" id="pjRef" placeholder="e.g. 1939–1941, Treaty of Versailles, appeasement"></div>
+    <div class="fg"><label class="fl">Project Scratchpad</label><textarea class="fta" spellcheck="true" id="pjNotes" placeholder="Running notes, questions, to-do items for this project…" style="min-height:80px"></textarea></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Status</label>
+        <select class="fs" id="pjStatus">
+          <option value="active">Active</option><option value="paused">Paused</option><option value="complete">Complete</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Target Date</label><input class="fi" id="pjDate" type="date"></div>
+    </div>
+    <div class="fg">
+      <label class="fl">Color Theme</label>
+      <div class="swatch-row" id="swatchRow">
+        <div class="swatch sel" style="background:#8b2020" data-c="#8b2020" onclick="selSwatch(this)"></div>
+        <div class="swatch" style="background:#1e3a6e" data-c="#1e3a6e" onclick="selSwatch(this)"></div>
+        <div class="swatch" style="background:#1a5230" data-c="#1a5230" onclick="selSwatch(this)"></div>
+        <div class="swatch" style="background:#4a2080" data-c="#4a2080" onclick="selSwatch(this)"></div>
+        <div class="swatch" style="background:#0e4a4a" data-c="#0e4a4a" onclick="selSwatch(this)"></div>
+        <div class="swatch" style="background:#5a3000" data-c="#5a3000" onclick="selSwatch(this)"></div>
+      </div>
+      <input type="hidden" id="pjColor" value="#8b2020">
+    </div>
+    <div class="fg">
+      <label class="fl">Links &amp; Resources</label>
+      <div id="pjLinkList"></div>
+      <div style="display:flex;gap:6px;margin-top:5px">
+        <input class="fi" id="pjLinkTitle" placeholder="Title" style="flex:1">
+        <input class="fi" id="pjLinkUrl" placeholder="URL or path" style="flex:2">
+        <button class="cbtn" onclick="addLink('pj')" style="flex-shrink:0;padding:0 10px">+</button>
+      </div>
+    </div>
+    <button class="btn-p" onclick="saveProject()">Save Project</button>
+    <button class="btn-s" onclick="closeM('mo-proj')">Cancel</button>
+  </div>
+</div>
+<!-- PROJECT DETAIL -->
+<div class="mo" id="mo-projDetail"><div class="modal"><div class="m-handle"></div><div id="projDetailContent"></div><button class="btn-s" onclick="closeM('mo-projDetail')">Close</button></div></div>
+<!-- XREF PICKER -->
+<div class="mo" id="mo-xref">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title">Link to Entry</div>
+    <div class="sbar" style="margin-bottom:10px"><span class="sicon">🔍</span><input type="text" id="xrefQ" placeholder="Search entries…" oninput="renderXrefSearch()"></div>
+    <div id="xrefResults"></div>
+    <button class="btn-s" onclick="closeM('mo-xref')">Cancel</button>
+  </div>
+</div>
+<!-- DAILY LOG -->
+<div class="mo" id="mo-log"><div class="modal"><div class="m-handle"></div><div class="m-title">Study Journal</div><div id="logContent"></div><button class="btn-s" onclick="closeM('mo-log')">Close</button></div></div>
+<!-- LOG ENTRY -->
+<div class="mo" id="mo-logEntry">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title">Log Today's Research</div>
+    <div class="fg"><label class="fl">What did you research today?</label><textarea class="fta" spellcheck="true" id="logText" placeholder="Topic, source, key findings, questions that arose…" style="min-height:90px"></textarea></div>
+    <div class="fg"><label class="fl">Minutes Studied</label><input class="fi" id="logMins" type="number" min="1" placeholder="e.g. 30"></div>
+    <button class="btn-p" onclick="saveLogEntry()">Record Session</button>
+    <button class="btn-s" onclick="closeM('mo-logEntry')">Cancel</button>
+  </div>
+</div>
+<!-- SEARCH -->
+<div class="mo" id="mo-search">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title">Search Codex</div>
+    <div class="sbar"><span class="sicon">🔍</span><input type="text" id="globalQ" placeholder="Search everything…" oninput="doSearch()"></div>
+    <div id="searchRes"><div class="empty" style="padding:20px"><div class="ei" style="font-size:28px">🔍</div><div class="es">Type to search all entries</div></div></div>
+    <button class="btn-s" onclick="closeM('mo-search')">Close</button>
+  </div>
+</div>
+<!-- STATS -->
+<div class="mo" id="mo-stats"><div class="modal"><div class="m-handle"></div><div class="m-title">Study Statistics</div><div id="statsContent"></div><button class="btn-s" onclick="closeM('mo-stats')">Close</button></div></div>
+<!-- QUICK ADD -->
+<div class="mo" id="mo-quickadd">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title">Add New Entry</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px">
+      <button class="btn-p" onclick="closeM('mo-quickadd');openBook()">📚 Add Book</button>
+      <button class="btn-s" onclick="closeM('mo-quickadd');openNote()">📜 New Note</button>
+      <button class="btn-s" onclick="closeM('mo-quickadd');openIdea()">💡 Capture Idea</button>
+      <button class="btn-s" onclick="closeM('mo-quickadd');openCite()">✒ Add Citation</button>
+    </div>
+    <button class="btn-s" onclick="closeM('mo-quickadd')">Cancel</button>
+  </div>
+</div>
+<!-- TAGS MODAL -->
+<div class="mo" id="mo-tags">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title">Tag Browser</div>
+    <div class="sbar" style="margin-bottom:10px"><span class="sicon">🔍</span><input type="text" id="tagQ" placeholder="Filter tags…" oninput="renderTagBrowser()"></div>
+    <div class="tag-rename-area" id="tagRenameArea" style="display:none">
+      <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--gold-dim);margin-bottom:8px">RENAME TAG</div>
+      <input type="hidden" id="tagOldName">
+      <input class="fi" id="tagNewName" placeholder="New tag name…" style="margin-bottom:8px">
+      <div style="display:flex;gap:8px">
+        <button class="cbtn" style="flex:1" onclick="confirmTagRename()">✓ Rename</button>
+        <button class="cbtn" style="flex:1" onclick="document.getElementById('tagRenameArea').style.display='none'">✕ Cancel</button>
+      </div>
+    </div>
+    <div id="tagList"></div>
+    <button class="btn-s" onclick="closeM('mo-tags')">Close</button>
+  </div>
+</div>
+<!-- SETTINGS -->
+<div class="mo" id="mo-settings">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title">Settings</div>
+    <div class="set-row">
+      <div><div class="set-label">Dark Mode</div><div class="set-sub">Toggle light / dark theme</div></div>
+      <div class="toggle" id="themeToggle" onclick="toggleTheme()"><div class="toggle-k"></div></div>
+    </div>
+    <div class="set-row">
+      <div class="set-label">Font Size</div>
+      <div class="fsize-btns">
+        <button class="fsize-btn" onclick="setFontSize('sm')">A</button>
+        <button class="fsize-btn active" onclick="setFontSize('md')">A</button>
+        <button class="fsize-btn" onclick="setFontSize('lg')">A</button>
+      </div>
+    </div>
+    <div style="margin-top:16px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:10px">Data Management</div>
+    <button class="btn-s" onclick="exportJSON()">📤 Export Backup (JSON)</button>
+    <label class="btn-s" style="display:block;text-align:center;margin-top:7px;cursor:pointer">📥 Import Backup<input type="file" accept=".json" style="display:none" onchange="importJSON(this)"></label>
+    <button class="btn-s" style="color:#c44;margin-top:16px" onclick="clearAllData()">🗑 Clear All Data</button>
+  </div>
+</div>
+<!-- EXPORT MARKDOWN -->
+<div class="mo" id="mo-export">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title">Export</div>
+    <textarea class="fta" id="exportResult" style="min-height:200px;font-family:monospace;font-size:12px" readonly></textarea>
+    <button class="btn-p" onclick="copyExport()">📋 Copy to Clipboard</button>
+    <button class="btn-s" onclick="closeM('mo-export')">Close</button>
+  </div>
+</div>
+<!-- BULK OPS -->
+<div class="mo" id="mo-bulk">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-title">Bulk Actions</div>
+    <div class="m-sub" id="bulkSubtitle">0 item(s) selected</div>
+    <div class="fg"><label class="fl">Add Tag to Selected</label>
+      <div style="display:flex;gap:8px">
+        <input class="fi" id="bulkTagInput" placeholder="Tag name…" style="flex:1">
+        <button class="cbtn" style="flex:0;padding:0 14px" onclick="bulkAddTag()">+ Add</button>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Move to Project</label>
+      <div style="display:flex;gap:8px">
+        <select class="fs" id="bulkProjSel" style="flex:1"><option value="">— None —</option></select>
+        <button class="cbtn" style="flex:0;padding:0 14px" onclick="bulkMoveProject()">Move</button>
+      </div>
+    </div>
+    <button class="btn-s" style="color:#c44" onclick="bulkDelete()">🗑 Delete Selected</button>
+    <button class="btn-s" onclick="closeM('mo-bulk');clearSelection()">Cancel</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════
+function save(k, v) {
+  try {
+    localStorage.setItem('cx2_' + k, JSON.stringify(v));
+  } catch(e) {
+    if (e.name === 'QuotaExceededError' || e.code === 22 || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+      toast('⚠️ Storage full! Export your data in Settings.');
+    } else { throw e; }
+  }
+}
+const load = k => { try { return JSON.parse(localStorage.getItem('cx2_' + k) || '[]'); } catch { return []; } };
+const loadObj = (k, d = {}) => { try { return JSON.parse(localStorage.getItem('cx2_' + k) || JSON.stringify(d)); } catch { return d; } };
+
+let books     = load('books');
+let notes     = load('notes');
+let ideas     = load('ideas');
+let citations = load('citations');
+let projects  = load('projects');
+let studyLog  = load('log');
+
+const filters = { lib: 'all', note: 'all', idea: 'all', cite: 'all' };
+let formLinks = { b: [], n: [], i: [], c: [], pj: [] };
+let formXrefs = { b: [], n: [], i: [], c: [] };
+let activeXrefTarget = null;
+
+// ── Tab conflict detection ──
+const _sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+localStorage.setItem('cx2_activeTab', _sessionId);
+window.addEventListener('storage', e => {
+  if (e.key === 'cx2_activeTab' && e.newValue && e.newValue !== _sessionId) {
+    document.getElementById('tabConflict').style.display = 'block';
+  }
+});
+
+// ════════════════════════════════════════════════
+// QUOTES
+// ════════════════════════════════════════════════
+const VOD = [
+  {t:"The more I read, the more I acquire, the more certain I am that I know nothing.",r:"Voltaire"},
+  {t:"Research is to see what everybody else has seen, and to think what nobody else has thought.",r:"Albert Szent-Györgyi"},
+  {t:"An investment in knowledge pays the best interest.",r:"Benjamin Franklin"},
+  {t:"The reading of all good books is like a conversation with the finest minds of past centuries.",r:"René Descartes"},
+  {t:"Not all those who wander are lost.",r:"J.R.R. Tolkien"},
+  {t:"The function of education is to teach one to think intensively and to think critically.",r:"Martin Luther King Jr."},
+  {t:"In the beginner's mind there are many possibilities, but in the expert's mind there are few.",r:"Shunryu Suzuki"},
+  {t:"The limits of my language mean the limits of my world.",r:"Ludwig Wittgenstein"},
+  {t:"A mind once stretched by a new idea never regains its original dimensions.",r:"Oliver Wendell Holmes"},
+  {t:"Somewhere, something incredible is waiting to be known.",r:"Carl Sagan"},
+  {t:"The art of being wise is the art of knowing what to overlook.",r:"William James"},
+  {t:"We are what we repeatedly do. Excellence, then, is not an act, but a habit.",r:"Aristotle"},
+  {t:"The unexamined life is not worth living.",r:"Socrates"},
+  {t:"There is no friend as loyal as a book.",r:"Ernest Hemingway"},
+  {t:"It is not that I'm so smart. But I stay with the questions much longer.",r:"Albert Einstein"},
+  {t:"What we observe is not nature itself, but nature exposed to our method of questioning.",r:"Werner Heisenberg"},
+  {t:"To know what you know and what you do not know — that is true knowledge.",r:"Confucius"},
+  {t:"The most important thing is not to stop questioning.",r:"Albert Einstein"},
+  {t:"Wonder is the beginning of wisdom.",r:"Socrates"},
+  {t:"A book is a dream you hold in your hands.",r:"Neil Gaiman"},
+  {t:"History is the witness that testifies to the passing of time.",r:"Cicero"},
+  {t:"The truth will set you free, but first it will make you miserable.",r:"James A. Garfield"},
+  {t:"Intellectual growth should commence at birth and cease only at death.",r:"Albert Einstein"},
+  {t:"I cannot live without books.",r:"Thomas Jefferson"},
+  {t:"Knowledge is the eye of desire and can become the pilot of the soul.",r:"Will Durant"},
+];
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+(function init() {
+  const d = new Date(), idx = (d.getFullYear() * 366 + d.getMonth() * 31 + d.getDate()) % VOD.length;
+  document.getElementById('vodText').textContent = VOD[idx].t;
+  document.getElementById('vodRef').textContent = VOD[idx].r;
+  renderStreak();
+  renderHome();
+  updateStats();
+  applySettings();
+})();
+
+// ════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════
+const pageTitles = { home: 'Home', library: 'Library', notes: 'Notes', ideas: 'Ideas', citations: 'Citations', projects: 'Projects' };
+let curPage = 'home';
+
+function nav(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('ni-' + name).classList.add('active');
+  document.getElementById('hSection').textContent = pageTitles[name];
+  curPage = name;
+  if (name === 'home') renderHome();
+  if (name === 'library') renderLibrary();
+  if (name === 'notes') renderNotes();
+  if (name === 'ideas') renderIdeas();
+  if (name === 'citations') renderCitations();
+  if (name === 'projects') renderProjects();
+}
+
+// ════════════════════════════════════════════════
+// MODAL HELPERS
+// ════════════════════════════════════════════════
+function openM(id) { document.getElementById(id).classList.add('open'); }
+function closeM(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.mo').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
+// Escape key closes topmost modal
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const fse = document.getElementById('fse');
+  if (fse.classList.contains('open')) { closeFSE(); return; }
+  const open = [...document.querySelectorAll('.mo.open')];
+  if (open.length) open[open.length - 1].classList.remove('open');
+});
+
+// ════════════════════════════════════════════════
+// FAB
+// ════════════════════════════════════════════════
+function fabAction() {
+  if (curPage === 'library') openBook();
+  else if (curPage === 'notes') openNote();
+  else if (curPage === 'ideas') openIdea();
+  else if (curPage === 'citations') openCite();
+  else if (curPage === 'projects') openProject();
+  else openM('mo-quickadd');
+}
+
+// ════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════
+let _toastT = null;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  if (_toastT) clearTimeout(_toastT);
+  _toastT = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════
+function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function timeAgo(ts) {
+  const d = Date.now() - ts;
+  if (d < 60000) return 'just now';
+  if (d < 3600000) return Math.floor(d / 60000) + 'm ago';
+  if (d < 86400000) return Math.floor(d / 3600000) + 'h ago';
+  if (d < 604800000) return Math.floor(d / 86400000) + 'd ago';
+  return new Date(ts).toLocaleDateString();
+}
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+function pulseSave(id) {
+  const b = document.getElementById(id); if (!b) return;
+  b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
+  setTimeout(() => b.classList.remove('pulse'), 600);
+}
+
+function sortList(arr, sv, titleField = 'title') {
+  return [...arr].sort((a, b) => {
+    if (sv === 'updated') return (b.updated || 0) - (a.updated || 0);
+    if (sv === 'created') return b.id - a.id;
+    if (sv === 'title') return (a[titleField] || '').localeCompare(b[titleField] || '');
+    if (sv === 'starred') return (b.starred ? 1 : 0) - (a.starred ? 1 : 0);
+    if (sv === 'priority') { const o = { high: 0, medium: 1, low: 2 }; return (o[a.priority] || 1) - (o[b.priority] || 1); }
+    return 0;
+  });
+}
+
+// ════════════════════════════════════════════════
+// MARKDOWN RENDERER
+// ════════════════════════════════════════════════
+function renderMd(src) {
+  if (!src) return '';
+  let s = esc(src);
+  s = s.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  s = s.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  s = s.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  s = s.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
+  s = s.replace(/^- (.+)$/gm, '<li>$1</li>');
+  s = s.replace(/(<li>.*<\/li>\n?)+/g, m => '<ul>' + m + '</ul>');
+  s = s.replace(/\n\n/g, '</p><p>');
+  s = s.replace(/\n/g, '<br>');
+  return '<p>' + s + '</p>';
+}
+function escRaw(s) { return String(s || '').replace(/'/g, "\\'"); }
+
+// ════════════════════════════════════════════════
+// LINKS
+// ════════════════════════════════════════════════
+function renderLinkList(prefix) {
+  const arr = formLinks[prefix];
+  const el = document.getElementById(prefix + 'LinkList');
+  if (!arr.length) { el.innerHTML = ''; return; }
+  el.innerHTML = arr.map((l, i) => `
+    <div class="link-item">
+      <span style="font-size:14px">${isURL(l.url) ? '🔗' : '📄'}</span>
+      <div style="flex:1;overflow:hidden">
+        <div class="link-title">${esc(l.title || l.url)}</div>
+        <div class="link-url">${esc(l.url)}</div>
+      </div>
+      <button class="link-del" onclick="removeLink('${prefix}',${i})">✕</button>
+    </div>`).join('');
+}
+function addLink(prefix) {
+  const t = document.getElementById(prefix + 'LinkTitle').value.trim();
+  const u = document.getElementById(prefix + 'LinkUrl').value.trim();
+  if (!u) return;
+  formLinks[prefix].push({ title: t || u, url: u });
+  document.getElementById(prefix + 'LinkTitle').value = '';
+  document.getElementById(prefix + 'LinkUrl').value = '';
+  renderLinkList(prefix);
+}
+function removeLink(prefix, i) { formLinks[prefix].splice(i, 1); renderLinkList(prefix); }
+function isURL(s) { return /^https?:\/\//i.test(s) || s.startsWith('www.'); }
+function renderLinksChips(links) {
+  if (!links || !links.length) return '';
+  return `<div style="margin-top:6px">${links.map(l =>
+    `<a class="link-chip" href="${esc(l.url)}" target="_blank" rel="noopener">${isURL(l.url) ? '🔗' : '📄'} <span>${esc(l.title || l.url)}</span></a>`
+  ).join('')}</div>`;
+}
+
+// ════════════════════════════════════════════════
+// CROSS-REFERENCES
+// ════════════════════════════════════════════════
+function openXref(prefix) {
+  activeXrefTarget = prefix;
+  document.getElementById('xrefQ').value = '';
+  renderXrefSearch();
+  openM('mo-xref');
+  setTimeout(() => document.getElementById('xrefQ').focus(), 100);
+}
+function allEntries() {
+  return [
+    ...books.map(b => ({ ...b, kind: 'book', label: b.title, sub: b.author || '' })),
+    ...notes.map(n => ({ ...n, kind: 'note', label: n.title, sub: n.ref || n.type })),
+    ...ideas.map(i => ({ ...i, kind: 'idea', label: i.title, sub: i.ref || '' })),
+    ...citations.map(c => ({ ...c, kind: 'citation', label: c.ref, sub: (c.quote || '').slice(0, 40) })),
+  ];
+}
+function renderXrefSearch() {
+  const q = document.getElementById('xrefQ').value.toLowerCase().trim();
+  const all = allEntries();
+  const cur = formXrefs[activeXrefTarget] || [];
+  let filtered = all.filter(e => !cur.find(r => r.id === e.id));
+  if (q) filtered = filtered.filter(e => e.label.toLowerCase().includes(q) || (e.sub || '').toLowerCase().includes(q));
+  const icons = { book: '📚', note: '📜', idea: '💡', citation: '✒' };
+  const el = document.getElementById('xrefResults');
+  if (!filtered.length) { el.innerHTML = `<div class="empty" style="padding:16px"><div class="es">No matching entries</div></div>`; return; }
+  el.innerHTML = filtered.slice(0, 12).map(e => `
+    <div class="xref-si" onclick="addXref('${e.id}','${e.kind}',${JSON.stringify(esc(e.label))})">
+      <span style="font-size:16px">${icons[e.kind] || '·'}</span>
+      <div style="flex:1;overflow:hidden">
+        <div style="font-size:13px;color:var(--cream)">${esc(e.label)}</div>
+        ${e.sub ? `<div style="font-size:11px;color:var(--cream-dim)">${esc((e.sub.slice ? e.sub.slice(0, 50) : e.sub))}</div>` : ''}
+      </div>
+      <span style="font-family:'Cinzel',serif;font-size:8px;color:var(--gold-dim)">${e.kind}</span>
+    </div>`).join('');
+}
+function addXref(id, kind, label) {
+  if (!formXrefs[activeXrefTarget]) formXrefs[activeXrefTarget] = [];
+  formXrefs[activeXrefTarget].push({ id, kind, label });
+  renderXrefList(activeXrefTarget);
+  closeM('mo-xref');
+  toast('🔗 Linked: ' + label);
+}
+function removeXref(prefix, id) { formXrefs[prefix] = formXrefs[prefix].filter(r => r.id !== id); renderXrefList(prefix); }
+function renderXrefList(prefix) {
+  const arr = formXrefs[prefix] || [];
+  const el = document.getElementById(prefix + 'XrefList');
+  if (!arr.length) { el.innerHTML = ''; return; }
+  const icons = { book: '📚', note: '📜', idea: '💡', citation: '✒' };
+  el.innerHTML = `<div class="xref-panel"><div class="xref-title">Linked Entries</div>${
+    arr.map(r => `<span class="xref-chip">${icons[r.kind] || ''} ${esc(r.label)}<span class="xref-rem" onclick="removeXref('${prefix}','${r.id}')">✕</span></span>`).join('')
+  }</div>`;
+}
+function renderXrefChips(xrefs) {
+  if (!xrefs || !xrefs.length) return '';
+  const icons = { book: '📚', note: '📜', idea: '💡', citation: '✒' };
+  return `<div class="xref-panel" style="margin-top:8px"><div class="xref-title">Linked Entries</div>${
+    xrefs.map(r => `<span class="xref-chip" onclick="jumpToEntry('${r.id}','${r.kind}')">${icons[r.kind] || ''} ${esc((r.label || '').slice(0, 40))}</span>`).join('')
+  }</div>`;
+}
+function jumpToEntry(id, kind) {
+  const pageMap = { book: 'library', note: 'notes', idea: 'ideas', citation: 'citations' };
+  closeM('mo-projDetail'); closeM('mo-read');
+  nav(pageMap[kind] || 'home');
+}
+
+// ════════════════════════════════════════════════
+// STAR
+// ════════════════════════════════════════════════
+function toggleStar(kind, id, e) {
+  e.stopPropagation();
+  const arr = { book: books, note: notes, idea: ideas, citation: citations }[kind];
+  const item = arr.find(x => x.id === id);
+  if (!item) return;
+  item.starred = !item.starred;
+  item.updated = Date.now();
+  save(kind + 's', arr);
+  const btn = e.target.closest('.star-btn');
+  btn.classList.toggle('starred', item.starred);
+  btn.textContent = item.starred ? '★' : '☆';
+  btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+  toast(item.starred ? '★ Starred' : '☆ Unstarred');
+  if (curPage === 'home') renderHome();
+  updateStats();
+}
+function starBtn(kind, item) {
+  return `<button class="star-btn ${item.starred ? 'starred' : ''}" onclick="toggleStar('${kind}','${item.id}',event)">${item.starred ? '★' : '☆'}</button>`;
+}
+
+// ════════════════════════════════════════════════
+// TAG CHIPS (clickable)
+// ════════════════════════════════════════════════
+function tagChip(tag, kind) {
+  const pageMap = { note: 'notes', idea: 'ideas', citation: 'citations' };
+  const page = pageMap[kind] || 'notes';
+  return `<span class="card-tag" onclick="event.stopPropagation();filterByTagOnPage('${esc(tag)}','${page}')">${esc(tag)}</span>`;
+}
+function filterByTagOnPage(tag, page) {
+  nav(page);
+  const inputMap = { notes: 'noteQ', ideas: 'ideaQ', citations: 'citeQ' };
+  const inp = document.getElementById(inputMap[page]);
+  if (inp) inp.value = tag;
+  if (page === 'notes') renderNotes();
+  else if (page === 'ideas') renderIdeas();
+  else if (page === 'citations') renderCitations();
+}
+
+// ════════════════════════════════════════════════
+// STREAK + DAILY LOG
+// ════════════════════════════════════════════════
+function renderStreak() {
+  const today = todayStr();
+  let streak = 0;
+  const days = new Set(studyLog.map(l => l.date));
+  let d = new Date();
+  while (true) {
+    const ds = d.toISOString().slice(0, 10);
+    if (days.has(ds)) { streak++; d.setDate(d.getDate() - 1); }
+    else break;
+  }
+  document.getElementById('streakNum').textContent = streak;
+  document.getElementById('streakSub').textContent = days.has(today) ? 'Logged today ✓' : "Tap + Log to record today's research";
+  const dots = document.getElementById('streakDots');
+  dots.innerHTML = '';
+  for (let i = 6; i >= 0; i--) {
+    const dd = new Date(); dd.setDate(dd.getDate() - i);
+    const ds = dd.toISOString().slice(0, 10);
+    const el = document.createElement('div');
+    el.className = 'sdot' + (days.has(ds) ? ' done' : (i === 0 ? ' today' : ''));
+    dots.appendChild(el);
+  }
+}
+function openLog() {
+  const el = document.getElementById('logContent');
+  if (!studyLog.length) {
+    el.innerHTML = `<div class="empty"><div class="ei">📖</div><div class="et">No entries yet</div><div class="es">Tap + Log to record your first study session</div></div>`;
+  } else {
+    el.innerHTML = `<div style="margin-bottom:12px">${studyLog.slice().reverse().slice(0, 30).map(l => `
+      <div class="log-entry">
+        <div class="log-date">${l.date.slice(5)}</div>
+        <div><div class="log-text">${esc(l.text)}</div>${l.mins ? `<div class="log-mins">${l.mins} min</div>` : ''}</div>
+      </div>`).join('')}</div>`;
+  }
+  openM('mo-log');
+}
+function openLogEntry() { openM('mo-logEntry'); setTimeout(() => document.getElementById('logText').focus(), 100); }
+function saveLogEntry() {
+  const text = document.getElementById('logText').value.trim();
+  if (!text) return toast('Please enter what you studied');
+  const mins = parseInt(document.getElementById('logMins').value) || 0;
+  studyLog.push({ date: todayStr(), text, mins, ts: Date.now() });
+  save('log', studyLog);
+  document.getElementById('logText').value = '';
+  document.getElementById('logMins').value = '';
+  closeM('mo-logEntry');
+  renderStreak();
+  toast('📖 Research session logged!');
+}
+
+// ════════════════════════════════════════════════
+// PROJECTS
+// ════════════════════════════════════════════════
+const projColors = { '#8b2020': 'card-red', '#1e3a6e': 'card-blue', '#1a5230': 'card-green', '#4a2080': 'card-purple', '#0e4a4a': 'card-teal', '#5a3000': '' };
+function colorClass(c) { return projColors[c] || ''; }
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+  return `${r},${g},${b}`;
+}
+function selSwatch(el) {
+  document.querySelectorAll('#swatchRow .swatch').forEach(s => s.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('pjColor').value = el.dataset.c;
+}
+function openProject(proj) {
+  const edit = !!proj;
+  document.getElementById('projMTitle').textContent = edit ? 'Edit Project' : 'New Research Project';
+  document.getElementById('projEditInd').style.display = edit ? 'block' : 'none';
+  document.getElementById('pjId').value = edit ? proj.id : '';
+  document.getElementById('pjName').value = edit ? proj.name : '';
+  document.getElementById('pjDesc').value = edit ? proj.desc || '' : '';
+  document.getElementById('pjRef').value = edit ? proj.ref || '' : '';
+  document.getElementById('pjNotes').value = edit ? proj.notes || '' : '';
+  document.getElementById('pjStatus').value = edit ? proj.status : 'active';
+  document.getElementById('pjDate').value = edit ? proj.targetDate || '' : '';
+  document.getElementById('pjColor').value = edit ? proj.color : '#8b2020';
+  document.querySelectorAll('#swatchRow .swatch').forEach(s => { s.classList.toggle('sel', s.dataset.c === (edit ? proj.color : '#8b2020')); });
+  formLinks.pj = edit ? (proj.links || []) : [];
+  renderLinkList('pj');
+  openM('mo-proj');
+}
+function saveProject() {
+  const name = document.getElementById('pjName').value.trim();
+  if (!name) return toast('Please enter a project name');
+  const id = document.getElementById('pjId').value || Date.now().toString();
+  const proj = {
+    id, name,
+    desc: document.getElementById('pjDesc').value.trim(),
+    ref: document.getElementById('pjRef').value.trim(),
+    notes: document.getElementById('pjNotes').value.trim(),
+    status: document.getElementById('pjStatus').value,
+    targetDate: document.getElementById('pjDate').value,
+    color: document.getElementById('pjColor').value,
+    links: formLinks.pj,
+    updated: Date.now()
+  };
+  const idx = projects.findIndex(p => p.id === id);
+  if (idx >= 0) projects[idx] = proj; else projects.unshift(proj);
+  save('projects', projects);
+  closeM('mo-proj');
+  renderProjects();
+  populateProjSelects();
+  toast('🗂 Project saved');
+}
+function deleteProject(id, e) {
+  e.stopPropagation();
+  if (!confirm('Delete this project? Entries will not be deleted.')) return;
+  projects = projects.filter(p => p.id !== id);
+  save('projects', projects);
+  renderProjects();
+  populateProjSelects();
+  toast('Project deleted');
+}
+function renderProjects() {
+  const q = document.getElementById('projQ').value.toLowerCase();
+  let filtered = projects.filter(p => !q || p.name.toLowerCase().includes(q) || (p.desc || '').toLowerCase().includes(q));
+  document.getElementById('projCnt').textContent = filtered.length;
+  const el = document.getElementById('projectsList');
+  if (!filtered.length) { el.innerHTML = '<div class="empty"><div class="ei">🗂</div><div class="et">No Projects Yet</div><div class="es">Tap + to start your first research project</div></div>'; return; }
+  el.innerHTML = filtered.map(p => {
+    const rgb = hexToRgb(p.color || '#8b2020');
+    const count = books.filter(b => b.projId === p.id).length + notes.filter(n => n.projId === p.id).length + ideas.filter(i => i.projId === p.id).length + citations.filter(c => c.projId === p.id).length;
+    return `<div class="proj-card" style="background:rgba(${rgb},.08);border-color:rgba(${rgb},.35)" onclick="openProjDetail('${p.id}')">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:rgba(${rgb},1)"></div>
+      <div class="proj-title" style="color:var(--gold-light)">${esc(p.name)}</div>
+      ${p.ref ? `<div class="proj-meta" style="color:rgba(${rgb},0.9)">${esc(p.ref)}</div>` : ''}
+      ${p.desc ? `<div class="card-body" style="font-size:12px;margin-bottom:8px">${esc(p.desc.slice(0, 100))}${p.desc.length > 100 ? '…' : ''}</div>` : ''}
+      <div class="proj-stats">
+        <span class="pstat" style="color:rgba(${rgb},1);border-color:rgba(${rgb},.4);background:rgba(${rgb},.1)">${p.status}</span>
+        <span class="pstat" style="color:var(--cream-dim);border-color:var(--border)">${count} entries</span>
+        ${p.targetDate ? `<span class="pstat" style="color:var(--cream-dim);border-color:var(--border)">Due ${p.targetDate}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function openProjDetail(id) {
+  const p = projects.find(x => x.id === id); if (!p) return;
+  const pb = books.filter(b => b.projId === id);
+  const pn = notes.filter(n => n.projId === id);
+  const pi = ideas.filter(i => i.projId === id);
+  const pc = citations.filter(c => c.projId === id);
+  const rgb = hexToRgb(p.color || '#8b2020');
+  let html = `<div style="border-bottom:3px solid rgba(${rgb},1);margin-bottom:16px;padding-bottom:12px">
+    <div class="rv-title">${esc(p.name)}</div>
+    ${p.ref ? `<div class="rv-meta">${esc(p.ref)}</div>` : ''}
+    ${p.desc ? `<div class="card-body">${esc(p.desc)}</div>` : ''}
+  </div>`;
+  if (p.notes) {
+    html += `<div class="proj-scratch"><div class="proj-scratch-title">✦ Scratchpad</div><div style="font-size:14px;color:var(--cream);line-height:1.7;white-space:pre-wrap">${esc(p.notes)}</div></div>`;
+  }
+  if (pb.length) { html += `<div class="shdr"><span class="stitle">📚 Books (${pb.length})</span></div>${pb.map(b => `<div class="card" style="padding:10px 12px;margin-bottom:6px;cursor:pointer" onclick="closeM('mo-projDetail');openReadView('book','${b.id}')"><div class="card-title" style="font-size:13px">${esc(b.title)}</div><div class="card-meta">${b.author ? esc(b.author) + ' · ' : ''}${b.status}</div></div>`).join('')}`; }
+  if (pn.length) { html += `<div class="shdr"><span class="stitle">📜 Notes (${pn.length})</span></div>${pn.map(n => `<div class="card" style="padding:10px 12px;margin-bottom:6px;cursor:pointer" onclick="closeM('mo-projDetail');openReadView('note','${n.id}')"><div class="card-title" style="font-size:13px">${esc(n.title)}</div><div class="card-meta">${n.type}</div></div>`).join('')}`; }
+  if (pi.length) { html += `<div class="shdr"><span class="stitle">💡 Ideas (${pi.length})</span></div>${pi.map(i => `<div class="card" style="padding:10px 12px;margin-bottom:6px;cursor:pointer" onclick="closeM('mo-projDetail');openReadView('idea','${i.id}')"><div class="card-title" style="font-size:13px">${esc(i.title)}</div><div class="card-meta">${i.priority} priority</div></div>`).join('')}`; }
+  if (pc.length) { html += `<div class="shdr"><span class="stitle">✒ Citations (${pc.length})</span></div>${pc.map(c => `<div class="cbox" style="margin-bottom:6px;cursor:pointer" onclick="closeM('mo-projDetail');openReadView('citation','${c.id}')">${esc(c.quote.slice(0, 100))}${c.quote.length > 100 ? '…' : ''}<div class="cref">${esc(c.ref)}</div></div>`).join('')}`; }
+  html += `<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+    <button class="rv-btn" style="flex:1" onclick="closeM('mo-projDetail');openProject(projects.find(p=>p.id==='${id}'))">✏ Edit</button>
+    <button class="rv-btn" style="flex:1" onclick="exportProjMd('${id}')">📄 Export MD</button>
+    <button class="rv-btn" style="flex:1" onclick="exportProjBibliography('${id}')">📋 Bibliography</button>
+    <button class="rv-btn" style="flex:1;color:#c44" onclick="deleteProject('${id}',event)">🗑 Delete</button>
+  </div>`;
+  document.getElementById('projDetailContent').innerHTML = html;
+  openM('mo-projDetail');
+}
+function populateProjSelects() {
+  ['bProj', 'nProj', 'iProj', 'cProj'].forEach(selId => {
+    const sel = document.getElementById(selId);
+    const cur = sel ? sel.value : '';
+    if (sel) {
+      sel.innerHTML = '<option value="">— None —</option>' + projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+      sel.value = cur;
+    }
+  });
+}
+
+// ════════════════════════════════════════════════
+// BOOKS
+// ════════════════════════════════════════════════
+function openBook(book) {
+  const e = !!book;
+  document.getElementById('bookMTitle').textContent = e ? 'Edit Book' : 'Add to Library';
+  document.getElementById('bookEditInd').style.display = e ? 'block' : 'none';
+  document.getElementById('bId').value = e ? book.id : '';
+  document.getElementById('bTitle').value = e ? book.title : '';
+  document.getElementById('bAuthor').value = e ? book.author || '' : '';
+  document.getElementById('bISBN').value = e ? book.isbn || '' : '';
+  document.getElementById('bCat').value = e ? book.category : 'primary';
+  document.getElementById('bStatus').value = e ? book.status : 'queued';
+  document.getElementById('bPR').value = e ? book.pagesRead || '' : '';
+  document.getElementById('bPT').value = e ? book.pagesTotal || '' : '';
+  document.getElementById('bNotes').value = e ? book.notes || '' : '';
+  populateProjSelects();
+  setTimeout(() => document.getElementById('bProj').value = e ? book.projId || '' : '', 10);
+  formLinks.b = e ? [...(book.links || [])] : [];
+  formXrefs.b = e ? [...(book.xrefs || [])] : [];
+  renderLinkList('b'); renderXrefList('b');
+  openM('mo-book');
+}
+function saveBook() {
+  const title = document.getElementById('bTitle').value.trim();
+  if (!title) return toast('Please enter a title');
+  const id = document.getElementById('bId').value || Date.now().toString();
+  const book = {
+    id, title, author: document.getElementById('bAuthor').value.trim(),
+    isbn: document.getElementById('bISBN').value.trim(),
+    category: document.getElementById('bCat').value, status: document.getElementById('bStatus').value,
+    pagesRead: parseInt(document.getElementById('bPR').value) || 0,
+    pagesTotal: parseInt(document.getElementById('bPT').value) || 0,
+    notes: document.getElementById('bNotes').value.trim(),
+    projId: document.getElementById('bProj').value,
+    links: formLinks.b, xrefs: formXrefs.b,
+    starred: books.find(b => b.id === id)?.starred || false, updated: Date.now()
+  };
+  const idx = books.findIndex(b => b.id === id);
+  if (idx >= 0) books[idx] = book; else books.unshift(book);
+  save('books', books);
+  closeM('mo-book'); renderLibrary(); renderHome(); updateStats();
+  pulseSave('bookSaveBtn');
+  toast('📚 Saved to Library');
+}
+function deleteBook(id, e) {
+  e.stopPropagation();
+  if (!confirm('Remove this book?')) return;
+  books = books.filter(b => b.id !== id);
+  save('books', books); renderLibrary(); updateStats(); renderHome(); toast('Book removed');
+}
+
+// ════════════════════════════════════════════════
+// NOTES
+// ════════════════════════════════════════════════
+function updateNoteWc() {
+  const ta = document.getElementById('nContent');
+  if (!ta) return;
+  const wc = ta.value.trim() ? ta.value.trim().split(/\s+/).length : 0;
+  const el = document.getElementById('noteWc');
+  if (el) el.textContent = wc + ' words';
+}
+function openNote(note) {
+  const e = !!note;
+  document.getElementById('noteMTitle').textContent = e ? 'Edit Note' : 'New Study Note';
+  document.getElementById('noteEditInd').style.display = e ? 'block' : 'none';
+  document.getElementById('nId').value = e ? note.id : '';
+  document.getElementById('nTitle').value = e ? note.title : '';
+  document.getElementById('nType').value = e ? note.type : 'analysis';
+  document.getElementById('nRef').value = e ? note.ref || '' : '';
+  document.getElementById('nContent').value = e ? note.content : '';
+  document.getElementById('nTags').value = e ? (note.tags || []).join(', ') : '';
+  populateProjSelects();
+  setTimeout(() => {
+    document.getElementById('nBook').innerHTML = '<option value="">— None —</option>' + books.map(b => `<option value="${b.id}">${esc(b.title)}</option>`).join('');
+    document.getElementById('nBook').value = e ? note.bookId || '' : '';
+    document.getElementById('nProj').value = e ? note.projId || '' : '';
+  }, 10);
+  formLinks.n = e ? [...(note.links || [])] : [];
+  formXrefs.n = e ? [...(note.xrefs || [])] : [];
+  renderLinkList('n'); renderXrefList('n');
+  updateNoteWc();
+  openM('mo-note');
+  if (!e) setTimeout(checkDraft, 60);
+}
+function saveNote() {
+  const title = document.getElementById('nTitle').value.trim();
+  const content = document.getElementById('nContent').value.trim();
+  if (!title || !content) return toast('Please fill title and content');
+  const id = document.getElementById('nId').value || Date.now().toString();
+  const note = {
+    id, title, content, type: document.getElementById('nType').value,
+    ref: document.getElementById('nRef').value.trim(), bookId: document.getElementById('nBook').value,
+    projId: document.getElementById('nProj').value,
+    tags: document.getElementById('nTags').value.split(',').map(t => t.trim()).filter(Boolean),
+    links: formLinks.n, xrefs: formXrefs.n,
+    starred: notes.find(n => n.id === id)?.starred || false, updated: Date.now()
+  };
+  const idx = notes.findIndex(n => n.id === id);
+  if (idx >= 0) notes[idx] = note; else notes.unshift(note);
+  save('notes', notes);
+  clearDraft();
+  closeM('mo-note'); renderNotes(); renderHome(); updateStats();
+  pulseSave('noteSaveBtn');
+  toast('📜 Note saved');
+}
+function deleteNote(id, e) {
+  e.stopPropagation();
+  if (!confirm('Delete this note?')) return;
+  notes = notes.filter(n => n.id !== id);
+  save('notes', notes); renderNotes(); updateStats(); renderHome(); toast('Note deleted');
+}
+
+// ════════════════════════════════════════════════
+// AUTOSAVE DRAFT
+// ════════════════════════════════════════════════
+function autosaveDraft() {
+  const ta = document.getElementById('nContent');
+  if (!ta) return;
+  const ss = ta.selectionStart, se = ta.selectionEnd;
+  clearTimeout(window._dt);
+  window._dt = setTimeout(() => {
+    const d = {
+      title: (document.getElementById('nTitle') || { value: '' }).value,
+      content: ta.value,
+      ts: Date.now()
+    };
+    try { localStorage.setItem('cx2_draft', JSON.stringify(d)); } catch (e) {}
+    if (document.activeElement === ta) {
+      ta.setSelectionRange(ss, se);
+    }
+  }, 800);
+}
+function checkDraft() {
+  try {
+    const d = JSON.parse(localStorage.getItem('cx2_draft') || 'null');
+    if (!d || !d.content) return;
+    const banner = document.getElementById('draftBanner');
+    const titleEl = document.getElementById('nTitle');
+    const contentEl = document.getElementById('nContent');
+    if (!contentEl.value) {
+      contentEl.value = d.content;
+      if (titleEl && !titleEl.value) titleEl.value = d.title || '';
+      if (banner) banner.style.display = 'block';
+      updateNoteWc();
+    }
+  } catch (e) {}
+}
+function clearDraft() {
+  localStorage.removeItem('cx2_draft');
+  const banner = document.getElementById('draftBanner');
+  if (banner) banner.style.display = 'none';
+}
+
+// ════════════════════════════════════════════════
+// IDEAS
+// ════════════════════════════════════════════════
+function openIdea(idea) {
+  const e = !!idea;
+  document.getElementById('ideaMTitle').textContent = e ? 'Edit Idea' : 'Capture Idea';
+  document.getElementById('ideaEditInd').style.display = e ? 'block' : 'none';
+  document.getElementById('iId').value = e ? idea.id : '';
+  document.getElementById('iTitle').value = e ? idea.title : '';
+  document.getElementById('iContent').value = e ? idea.content || '' : '';
+  document.getElementById('iRef').value = e ? idea.ref || '' : '';
+  document.getElementById('iPri').value = e ? idea.priority : 'medium';
+  document.getElementById('iTags').value = e ? (idea.tags || []).join(', ') : '';
+  populateProjSelects();
+  setTimeout(() => document.getElementById('iProj').value = e ? idea.projId || '' : '', 10);
+  formLinks.i = e ? [...(idea.links || [])] : [];
+  formXrefs.i = e ? [...(idea.xrefs || [])] : [];
+  renderLinkList('i'); renderXrefList('i');
+  openM('mo-idea');
+}
+function saveIdea() {
+  const title = document.getElementById('iTitle').value.trim();
+  if (!title) return toast('Please enter your idea');
+  const id = document.getElementById('iId').value || Date.now().toString();
+  const idea = {
+    id, title, content: document.getElementById('iContent').value.trim(),
+    ref: document.getElementById('iRef').value.trim(), priority: document.getElementById('iPri').value,
+    projId: document.getElementById('iProj').value,
+    tags: document.getElementById('iTags').value.split(',').map(t => t.trim()).filter(Boolean),
+    links: formLinks.i, xrefs: formXrefs.i,
+    starred: ideas.find(i => i.id === id)?.starred || false, updated: Date.now()
+  };
+  const idx = ideas.findIndex(i => i.id === id);
+  if (idx >= 0) ideas[idx] = idea; else ideas.unshift(idea);
+  save('ideas', ideas);
+  closeM('mo-idea'); renderIdeas(); renderHome(); updateStats(); toast('💡 Idea captured');
+}
+function deleteIdea(id, e) {
+  e.stopPropagation();
+  if (!confirm('Delete this idea?')) return;
+  ideas = ideas.filter(i => i.id !== id);
+  save('ideas', ideas); renderIdeas(); updateStats(); renderHome(); toast('Idea deleted');
+}
+
+// ════════════════════════════════════════════════
+// CITATIONS
+// ════════════════════════════════════════════════
+function openCite(cite) {
+  const e = !!cite;
+  document.getElementById('citeMTitle').textContent = e ? 'Edit Citation' : 'Add Citation';
+  document.getElementById('citeEditInd').style.display = e ? 'block' : 'none';
+  document.getElementById('cId').value = e ? cite.id : '';
+  document.getElementById('cQuote').value = e ? cite.quote : '';
+  document.getElementById('cRef').value = e ? cite.ref : '';
+  document.getElementById('cType').value = e ? cite.type : 'book';
+  document.getElementById('cTrans').value = e ? cite.translation || '' : '';
+  document.getElementById('cAuthor').value = e ? cite.author || '' : '';
+  document.getElementById('cYear').value = e ? cite.year || '' : '';
+  document.getElementById('cPub').value = e ? cite.pub || '' : '';
+  document.getElementById('cDoi').value = e ? cite.doi || '' : '';
+  document.getElementById('cComm').value = e ? cite.commentary || '' : '';
+  document.getElementById('cTags').value = e ? (cite.tags || []).join(', ') : '';
+  populateProjSelects();
+  setTimeout(() => document.getElementById('cProj').value = e ? cite.projId || '' : '', 10);
+  formLinks.c = e ? [...(cite.links || [])] : [];
+  formXrefs.c = e ? [...(cite.xrefs || [])] : [];
+  renderLinkList('c'); renderXrefList('c');
+  openM('mo-cite');
+}
+function saveCite() {
+  const quote = document.getElementById('cQuote').value.trim();
+  const ref = document.getElementById('cRef').value.trim();
+  if (!quote || !ref) return toast('Please enter the quote and reference');
+  const id = document.getElementById('cId').value || Date.now().toString();
+  const cite = {
+    id, quote, ref, type: document.getElementById('cType').value,
+    translation: document.getElementById('cTrans').value.trim(),
+    author: document.getElementById('cAuthor').value.trim(),
+    year: document.getElementById('cYear').value.trim(),
+    pub: document.getElementById('cPub').value.trim(),
+    doi: document.getElementById('cDoi').value.trim(),
+    commentary: document.getElementById('cComm').value.trim(),
+    projId: document.getElementById('cProj').value,
+    tags: document.getElementById('cTags').value.split(',').map(t => t.trim()).filter(Boolean),
+    links: formLinks.c, xrefs: formXrefs.c,
+    starred: citations.find(c => c.id === id)?.starred || false, updated: Date.now()
+  };
+  const idx = citations.findIndex(c => c.id === id);
+  if (idx >= 0) citations[idx] = cite; else citations.unshift(cite);
+  save('citations', citations);
+  closeM('mo-cite'); renderCitations(); renderHome(); updateStats(); toast('✒ Citation saved');
+}
+function deleteCite(id, e) {
+  e.stopPropagation();
+  if (!confirm('Delete this citation?')) return;
+  citations = citations.filter(c => c.id !== id);
+  save('citations', citations); renderCitations(); updateStats(); renderHome(); toast('Citation deleted');
+}
+
+// ════════════════════════════════════════════════
+// RENDER LIBRARY
+// ════════════════════════════════════════════════
+const catColors = { primary: 'card-red', secondary: 'card-blue', academic: 'card-green', biography: 'card-purple', historical: 'card-blue', scientific: 'card-teal', literary: 'card-purple', reference: '', other: '' };
+const sbMap = { reading: 'sb-reading', complete: 'sb-complete', queued: 'sb-queued', paused: 'sb-paused' };
+function renderLibrary() {
+  const q = document.getElementById('libQ').value.toLowerCase();
+  const f = filters.lib;
+  const sv = (document.getElementById('libSort') || { value: 'updated' }).value;
+  let list = books.filter(b => {
+    if (f === 'starred') return b.starred;
+    if (f !== 'all' && b.status !== f) return false;
+    return !q || b.title.toLowerCase().includes(q) || (b.author || '').toLowerCase().includes(q) || (b.isbn || '').toLowerCase().includes(q);
+  });
+  list = sortList(list, sv, 'title');
+  document.getElementById('libCnt').textContent = list.length;
+  const el = document.getElementById('libraryList');
+  if (!list.length) { el.innerHTML = '<div class="empty"><div class="ei">📚</div><div class="et">No Books Found</div><div class="es">Tap + to add your first text</div></div>'; return; }
+  el.innerHTML = list.map(b => {
+    const pct = b.pagesTotal > 0 ? Math.min(100, Math.round(b.pagesRead / b.pagesTotal * 100)) : 0;
+    const proj = projects.find(p => p.id === b.projId);
+    return '<div class="swrap">' +
+      '<div class="card ' + (catColors[b.category] || '') + '" onclick="openReadView(\'book\',\'' + b.id + '\')">' +
+        starBtn('book', b) +
+        '<span class="sb ' + (sbMap[b.status] || '') + '">' + b.status + '</span>' +
+        '<div class="card-title">' + esc(b.title) + '</div>' +
+        '<div class="card-meta">' + (b.author ? esc(b.author) + (b.isbn ? ' · ISBN ' + esc(b.isbn) : '') : esc(b.category)) + '</div>' +
+        (proj ? '<span class="card-tag">🗂 ' + esc(proj.name) + '</span>' : '') +
+        (b.pagesTotal > 0 ? '<div class="pwrap"><div class="pbar" style="width:' + pct + '%"></div></div><div class="plabel"><span>p.' + b.pagesRead + '</span><span>' + pct + '%</span></div>' : '') +
+        (b.notes ? '<div class="card-body" style="font-size:12px;margin-top:5px">' + esc(b.notes.slice(0, 80)) + (b.notes.length > 80 ? '…' : '') + '</div>' : '') +
+        renderLinksChips(b.links) +
+      '</div>' +
+      '<div class="sact">' +
+        '<button class="sabtn sa-star" onclick="toggleStar(\'book\',\'' + b.id + '\',event);resetSwipe(this)">★</button>' +
+        '<button class="sabtn sa-del" onclick="deleteBook(\'' + b.id + '\',event)">🗑</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+// ════════════════════════════════════════════════
+// RENDER NOTES
+// ════════════════════════════════════════════════
+const noteCC = { analysis: 'card-blue', summary: '', critique: 'card-red', reflection: 'card-green', methodology: 'card-purple', other: '' };
+function noteWcBadge(content) {
+  if (!content) return '';
+  const wc = content.trim().split(/\s+/).length;
+  return `<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:.5px;color:var(--gold-dim);margin-left:4px">${wc}w</span>`;
+}
+function renderNotes() {
+  const q = document.getElementById('noteQ').value.toLowerCase();
+  const f = filters.note;
+  const sv = (document.getElementById('noteSort') || { value: 'updated' }).value;
+  let list = notes.filter(n => {
+    if (f === 'starred') return n.starred;
+    if (f !== 'all' && n.type !== f) return false;
+    return !q || n.title.toLowerCase().includes(q) || (n.content || '').toLowerCase().includes(q) || (n.ref || '').toLowerCase().includes(q) || (n.tags || []).some(t => t.toLowerCase().includes(q));
+  });
+  list = sortList(list, sv, 'title');
+  document.getElementById('noteCnt').textContent = list.length;
+  const el = document.getElementById('notesList');
+  if (!list.length) { el.innerHTML = '<div class="empty"><div class="ei">📜</div><div class="et">No Notes Yet</div><div class="es">Tap + to capture your first study note</div></div>'; return; }
+  const inSel = _selMode === 'note';
+  el.innerHTML = list.map(n => {
+    const book = books.find(b => b.id === n.bookId);
+    const proj = projects.find(p => p.id === n.projId);
+    const preview = (n.content || '').length > 130 ? n.content.slice(0, 130) + '…' : n.content || '';
+    const selDot = inSel ? `<div id="sel-${n.id}" onclick="event.stopPropagation();toggleItemSelect('note','${n.id}')" style="position:absolute;top:10px;left:10px;width:22px;height:22px;border-radius:50%;border:2px solid var(--gold);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;z-index:5">${_selIds.has(n.id) ? '✓' : '○'}</div>` : '';
+    const cardClick = inSel ? `toggleItemSelect('note','${n.id}')` : `openReadView('note','${n.id}')`;
+    return '<div class="swrap">' +
+      '<div class="card ' + (noteCC[n.type] || '') + (inSel ? '" style="padding-left:38px' : '') + '" onclick="' + cardClick + '">' +
+        selDot + starBtn('note', n) +
+        '<div class="card-title">' + esc(n.title) + '</div>' +
+        '<div class="card-meta">' + n.type + (n.ref ? ' · ' + esc(n.ref) : '') + (book ? ' · ' + esc(book.title) : '') + ' · ' + timeAgo(n.updated) + noteWcBadge(n.content) + '</div>' +
+        '<div class="card-body">' + esc(preview) + '</div>' +
+        (proj ? '<span class="card-tag">🗂 ' + esc(proj.name) + '</span>' : '') +
+        (n.tags || []).map(t => tagChip(t, 'note')).join('') +
+        renderLinksChips(n.links) +
+      '</div>' +
+      '<div class="sact">' +
+        '<button class="sabtn sa-star" onclick="toggleStar(\'note\',\'' + n.id + '\',event);resetSwipe(this)">★</button>' +
+        '<button class="sabtn sa-del" onclick="deleteNote(\'' + n.id + '\',event)">🗑</button>' +
+      '</div></div>';
+  }).join('');
+  // Update bulk bar
+  const bar = document.getElementById('noteBulkBar');
+  if (bar) { bar.style.display = inSel ? 'flex' : 'none'; const bc = bar.querySelector('.bulk-count'); if (bc) bc.textContent = _selIds.size + ' selected'; }
+}
+
+// ════════════════════════════════════════════════
+// RENDER IDEAS
+// ════════════════════════════════════════════════
+const priIcon = { high: '⚡', medium: '◆', low: '◇' };
+const priCC = { high: 'card-red', medium: '', low: '' };
+function renderIdeas() {
+  const q = document.getElementById('ideaQ').value.toLowerCase();
+  const f = filters.idea;
+  const sv = (document.getElementById('ideaSort') || { value: 'updated' }).value;
+  let list = ideas.filter(i => {
+    if (f === 'starred') return i.starred;
+    if (f === 'high' || f === 'medium' || f === 'low') return i.priority === f && (!q || i.title.toLowerCase().includes(q));
+    return !q || i.title.toLowerCase().includes(q) || (i.content || '').toLowerCase().includes(q) || (i.tags || []).some(t => t.toLowerCase().includes(q));
+  });
+  list = sortList(list, sv, 'title');
+  document.getElementById('ideaCnt').textContent = list.length;
+  const el = document.getElementById('ideasList');
+  if (!list.length) { el.innerHTML = '<div class="empty"><div class="ei">💡</div><div class="et">No Ideas Yet</div><div class="es">Use Quick Capture or tap +</div></div>'; return; }
+  const inSel = _selMode === 'idea';
+  el.innerHTML = list.map(i => {
+    const proj = projects.find(p => p.id === i.projId);
+    const preview = (i.content || '').length > 130 ? i.content.slice(0, 130) + '…' : i.content || '';
+    const selDot = inSel ? `<div id="sel-${i.id}" onclick="event.stopPropagation();toggleItemSelect('idea','${i.id}')" style="position:absolute;top:10px;left:10px;width:22px;height:22px;border-radius:50%;border:2px solid var(--gold);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;z-index:5">${_selIds.has(i.id) ? '✓' : '○'}</div>` : '';
+    const cardClick = inSel ? `toggleItemSelect('idea','${i.id}')` : `openReadView('idea','${i.id}')`;
+    return '<div class="swrap">' +
+      '<div class="card ' + (priCC[i.priority] || '') + (inSel ? '" style="padding-left:38px' : '') + '" onclick="' + cardClick + '">' +
+        selDot + starBtn('idea', i) +
+        '<div class="card-title">' + (priIcon[i.priority] || '◆') + ' ' + esc(i.title) + '</div>' +
+        '<div class="card-meta">' + i.priority + ' priority' + (i.ref ? ' · ' + esc(i.ref) : '') + ' · ' + timeAgo(i.updated) + '</div>' +
+        (preview ? '<div class="card-body">' + esc(preview) + '</div>' : '') +
+        (proj ? '<span class="card-tag">🗂 ' + esc(proj.name) + '</span>' : '') +
+        (i.tags || []).map(t => tagChip(t, 'idea')).join('') +
+        renderLinksChips(i.links) +
+      '</div>' +
+      '<div class="sact">' +
+        '<button class="sabtn sa-star" onclick="toggleStar(\'idea\',\'' + i.id + '\',event);resetSwipe(this)">★</button>' +
+        '<button class="sabtn sa-del" onclick="deleteIdea(\'' + i.id + '\',event)">🗑</button>' +
+      '</div></div>';
+  }).join('');
+  const bar = document.getElementById('ideaBulkBar');
+  if (bar) { bar.style.display = inSel ? 'flex' : 'none'; const bc = bar.querySelector('.bulk-count'); if (bc) bc.textContent = _selIds.size + ' selected'; }
+}
+
+// ════════════════════════════════════════════════
+// RENDER CITATIONS
+// ════════════════════════════════════════════════
+const citeCC = { book: 'card-red', journal: 'card-blue', primary: 'card-green', web: 'card-teal', interview: 'card-purple', other: '' };
+function renderCitations() {
+  const q = document.getElementById('citeQ').value.toLowerCase();
+  const f = filters.cite;
+  const sv = (document.getElementById('citeSort') || { value: 'updated' }).value;
+  let list = citations.filter(c => {
+    if (f === 'starred') return c.starred;
+    if (f !== 'all' && c.type !== f) return false;
+    return !q || (c.quote || '').toLowerCase().includes(q) || (c.ref || '').toLowerCase().includes(q) || (c.author || '').toLowerCase().includes(q) || (c.tags || []).some(t => t.toLowerCase().includes(q)) || (c.commentary || '').toLowerCase().includes(q);
+  });
+  list = sortList(list, sv, 'ref');
+  document.getElementById('citeCnt').textContent = list.length;
+  const el = document.getElementById('citationsList');
+  if (!list.length) { el.innerHTML = '<div class="empty"><div class="ei">✒</div><div class="et">No Citations Yet</div><div class="es">Tap + to save your first citation</div></div>'; return; }
+  const inSel = _selMode === 'cite';
+  el.innerHTML = list.map(c => {
+    const proj = projects.find(p => p.id === c.projId);
+    const selDot = inSel ? `<div id="sel-${c.id}" onclick="event.stopPropagation();toggleItemSelect('cite','${c.id}')" style="position:absolute;top:10px;left:10px;width:22px;height:22px;border-radius:50%;border:2px solid var(--gold);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;z-index:5">${_selIds.has(c.id) ? '✓' : '○'}</div>` : '';
+    const cardClick = inSel ? `toggleItemSelect('cite','${c.id}')` : `openReadView('citation','${c.id}')`;
+    return '<div class="swrap">' +
+      '<div class="card ' + (citeCC[c.type] || '') + (inSel ? '" style="padding-left:38px' : '') + '" onclick="' + cardClick + '">' +
+        selDot + starBtn('citation', c) +
+        '<div class="card-meta">' + c.type + (c.author ? ' · ' + esc(c.author) : '') + (c.year ? ' (' + c.year + ')' : '') + ' · ' + timeAgo(c.updated) + '</div>' +
+        '<div class="cbox">' + esc((c.quote || '').slice(0, 160)) + ((c.quote || '').length > 160 ? '…' : '') + '<div class="cref">' + esc(c.ref) + '</div></div>' +
+        (proj ? '<span class="card-tag">🗂 ' + esc(proj.name) + '</span>' : '') +
+        (c.tags || []).map(t => tagChip(t, 'citation')).join('') +
+        renderLinksChips(c.links) +
+        '<div class="card-actions">' +
+          '<button class="cbtn" onclick="event.stopPropagation();openCiteFmt(\'' + c.id + '\')">📝 Format</button>' +
+          '<button class="cbtn" onclick="event.stopPropagation();copyCite(\'' + c.id + '\')">📋 Copy</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sact">' +
+        '<button class="sabtn sa-star" onclick="toggleStar(\'citation\',\'' + c.id + '\',event);resetSwipe(this)">★</button>' +
+        '<button class="sabtn sa-del" onclick="deleteCite(\'' + c.id + '\',event)">🗑</button>' +
+      '</div></div>';
+  }).join('');
+  const bar = document.getElementById('citeBulkBar');
+  if (bar) { bar.style.display = inSel ? 'flex' : 'none'; const bc = bar.querySelector('.bulk-count'); if (bc) bc.textContent = _selIds.size + ' selected'; }
+}
+
+// ════════════════════════════════════════════════
+// RENDER HOME
+// ════════════════════════════════════════════════
+function renderHome() {
+  updateStats();
+  const icons = { book: '📚', note: '📜', idea: '💡', citation: '✒' };
+  const sortEl = document.getElementById('homeSort');
+  const sv = sortEl ? sortEl.value : 'updated';
+  const mini = item => {
+    const title = item.kind === 'citation' ? item.ref : item.title;
+    const sub = (item.kind === 'citation' ? (item.quote || '') : (item.content || item.notes || '')).slice(0, 70);
+    const wc = (item.kind === 'note' && item.content) ? '<span style="font-family:\'Cinzel\',serif;font-size:8px;color:var(--gold-dim);margin-left:6px">' + item.content.trim().split(/\s+/).length + 'w</span>' : '';
+    return '<div class="card" style="padding:11px 13px;cursor:pointer;margin-bottom:8px" onclick="openReadView(\'' + item.kind + '\',\'' + item.id + '\')">' +
+      '<div class="card-meta">' + icons[item.kind] + ' ' + item.kind + ' · ' + timeAgo(item.updated) + (item.starred ? ' · ★' : '') + wc + '</div>' +
+      '<div class="card-title" style="font-size:14px">' + esc(title || '') + '</div>' +
+      (sub ? '<div class="card-body" style="font-size:12px">' + esc(sub) + (sub.length >= 70 ? '…' : '') + '</div>' : '') +
+      '</div>';
+  };
+  const starred = [
+    ...books.filter(b => b.starred).map(b => ({ ...b, kind: 'book' })),
+    ...notes.filter(n => n.starred).map(n => ({ ...n, kind: 'note' })),
+    ...ideas.filter(i => i.starred).map(i => ({ ...i, kind: 'idea' })),
+    ...citations.filter(c => c.starred).map(c => ({ ...c, kind: 'citation' }))
+  ].sort((a, b) => b.updated - a.updated);
+  document.getElementById('starCount').textContent = starred.length;
+  document.getElementById('starredList').innerHTML = starred.length
+    ? starred.slice(0, 4).map(mini).join('')
+    : '<div style="text-align:center;padding:12px;color:var(--cream-dim);font-size:13px;font-style:italic">Tap ☆ on any entry to star it</div>';
+  let all = [
+    ...books.map(b => ({ ...b, kind: 'book' })),
+    ...notes.map(n => ({ ...n, kind: 'note' })),
+    ...ideas.map(i => ({ ...i, kind: 'idea' })),
+    ...citations.map(c => ({ ...c, kind: 'citation' }))
+  ];
+  if (['book', 'note', 'idea', 'citation'].includes(sv)) {
+    all = all.filter(x => x.kind === sv).sort((a, b) => b.updated - a.updated);
+  } else if (sv === 'starred') {
+    all = all.filter(x => x.starred).sort((a, b) => b.updated - a.updated);
+  } else {
+    all = all.sort((a, b) => b.updated - a.updated);
+  }
+  document.getElementById('recentList').innerHTML = all.length
+    ? all.slice(0, 6).map(mini).join('')
+    : '<div class="empty"><div class="ei">✦</div><div class="et">Begin Your Research</div><div class="es">Add books, notes, ideas, and citations</div></div>';
+}
+
+// ════════════════════════════════════════════════
+// STATS
+// ════════════════════════════════════════════════
+function updateStats() {
+  document.getElementById('stBooks').textContent = books.length;
+  document.getElementById('stNotes').textContent = notes.length;
+  document.getElementById('stIdeas').textContent = ideas.length;
+  document.getElementById('stCites').textContent = citations.length;
+}
+function openStats() {
+  const reading = books.filter(b => b.status === 'reading').length;
+  const complete = books.filter(b => b.status === 'complete').length;
+  const starred = [...books, ...notes, ...ideas, ...citations].filter(x => x.starred).length;
+  const allTags = [...notes.flatMap(n => n.tags || []), ...ideas.flatMap(i => i.tags || []), ...citations.flatMap(c => c.tags || [])];
+  const tf = {}; allTags.forEach(t => tf[t] = (tf[t] || 0) + 1);
+  const topTags = Object.entries(tf).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const totalMins = studyLog.reduce((s, l) => s + (l.mins || 0), 0);
+  document.getElementById('statsContent').innerHTML = `
+    <div class="sgrid">
+      <div class="scard"><div class="snum">${books.length}</div><div class="slabel">Books</div></div>
+      <div class="scard"><div class="snum">${reading}</div><div class="slabel">Reading</div></div>
+      <div class="scard"><div class="snum">${complete}</div><div class="slabel">Complete</div></div>
+      <div class="scard"><div class="snum">${starred}</div><div class="slabel">Starred</div></div>
+      <div class="scard"><div class="snum">${projects.length}</div><div class="slabel">Projects</div></div>
+      <div class="scard"><div class="snum">${studyLog.length}</div><div class="slabel">Sessions</div></div>
+      <div class="scard"><div class="snum">${totalMins}</div><div class="slabel">Mins Logged</div></div>
+      <div class="scard"><div class="snum">${notes.length + ideas.length + citations.length}</div><div class="slabel">Entries</div></div>
+    </div>
+    ${topTags.length ? '<div class="shdr"><span class="stitle">✦ Top Tags</span></div><div style="margin-bottom:12px">' + topTags.map(([t, n]) => `<span class="card-tag">${esc(t)} (${n})</span>`).join('') + '</div>' : ''}
+  `;
+  openM('mo-stats');
+}
+
+// ════════════════════════════════════════════════
+// FILTER
+// ════════════════════════════════════════════════
+function setFilter(type, val, el) {
+  filters[type] = val;
+  el.closest('.pills').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  if (type === 'lib') renderLibrary();
+  if (type === 'note') renderNotes();
+  if (type === 'idea') renderIdeas();
+  if (type === 'cite') renderCitations();
+}
+
+// ════════════════════════════════════════════════
+// SEARCH
+// ════════════════════════════════════════════════
+function openSearch() {
+  document.getElementById('globalQ').value = '';
+  document.getElementById('searchRes').innerHTML = `<div class="empty" style="padding:20px"><div class="ei" style="font-size:28px">🔍</div><div class="es">Type to search all entries</div></div>`;
+  openM('mo-search');
+  setTimeout(() => document.getElementById('globalQ').focus(), 100);
+}
+function doSearch() {
+  const q = document.getElementById('globalQ').value.toLowerCase().trim();
+  const el = document.getElementById('searchRes');
+  if (!q) { el.innerHTML = ''; return; }
+  const res = [];
+  books.forEach(b => {
+    if ([b.title, b.author || '', b.isbn || '', b.notes || '', b.category || ''].join(' ').toLowerCase().includes(q)) res.push({ ...b, kind: 'book' });
+  });
+  notes.forEach(n => {
+    if ([n.title, n.content || '', n.ref || '', (n.tags || []).join(' ')].join(' ').toLowerCase().includes(q)) res.push({ ...n, kind: 'note' });
+  });
+  ideas.forEach(i => {
+    if ([i.title, i.content || '', i.ref || '', (i.tags || []).join(' ')].join(' ').toLowerCase().includes(q)) res.push({ ...i, kind: 'idea' });
+  });
+  citations.forEach(c => {
+    if ([c.quote || '', c.ref, c.author || '', c.commentary || '', (c.tags || []).join(' '), c.pub || '', c.doi || ''].join(' ').toLowerCase().includes(q)) res.push({ ...c, kind: 'citation' });
+  });
+  if (!res.length) { el.innerHTML = `<div class="empty" style="padding:16px"><div class="es">No results for "${esc(q)}"</div></div>`; return; }
+  function highlight(text, q) {
+    if (!text) return '';
+    const idx = text.toLowerCase().indexOf(q);
+    if (idx < 0) return esc(text.slice(0, 80));
+    const start = Math.max(0, idx - 20);
+    const end = Math.min(text.length, idx + q.length + 50);
+    const snippet = (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+    return esc(snippet).replace(new RegExp(esc(q), 'gi'), '<mark>$&</mark>');
+  }
+  const icons = { book: '📚', note: '📜', idea: '💡', citation: '✒' };
+  el.innerHTML = res.slice(0, 20).map(r => {
+    const title = r.kind === 'citation' ? r.ref : r.title;
+    const body = r.kind === 'citation' ? (r.quote || '') : (r.content || r.notes || '');
+    return `<div class="card" style="padding:10px 12px;margin-bottom:7px;cursor:pointer" onclick="closeM('mo-search');openReadView('${r.kind}','${r.id}')">
+      <div class="card-meta">${icons[r.kind]} ${r.kind}</div>
+      <div class="card-title" style="font-size:14px">${esc(title || '')}</div>
+      ${body ? `<div class="card-body" style="font-size:12px">${highlight(body, q)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════
+// READ VIEW
+// ════════════════════════════════════════════════
+function renderRelated(item) {
+  const tags = item.tags || []; if (!tags.length) return '';
+  const icons = { book: '📚', note: '📜', idea: '💡', citation: '✒' };
+  const related = allEntries().filter(e => e.id !== item.id && (e.tags || []).some(t => tags.includes(t))).slice(0, 4);
+  if (!related.length) return '';
+  return '<div class="related-sec"><div style="font-family:\'Cinzel\',serif;font-size:8px;letter-spacing:1.5px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px">✦ Related</div>' +
+    related.map(r => '<span class="xref-chip" onclick="closeM(\'mo-read\');openReadView(\'' + r.kind + '\',\'' + r.id + '\')">' + (icons[r.kind] || '') + ' ' + esc((r.title || r.ref || '').slice(0, 40)) + '</span>').join('') + '</div>';
+}
+function openReadView(kind, id) {
+  const arrs = { book: books, note: notes, idea: ideas, citation: citations };
+  const item = arrs[kind]?.find(x => x.id === id); if (!item) return;
+  const proj = projects.find(p => p.id === item.projId);
+  const icons = { book: '📚', note: '📜', idea: '💡', citation: '✒' };
+  let html = '';
+  if (kind === 'book') {
+    const pct = item.pagesTotal > 0 ? Math.min(100, Math.round(item.pagesRead / item.pagesTotal * 100)) : 0;
+    html = '<span class="sb ' + (sbMap[item.status] || '') + '">' + item.status + '</span>' +
+      '<div class="rv-title">' + esc(item.title) + '</div>' +
+      '<div class="rv-meta">' + (item.author ? esc(item.author) : '') + (item.isbn ? ' · ISBN ' + esc(item.isbn) : '') + ' · ' + esc(item.category) + '</div>' +
+      (item.pagesTotal > 0 ? '<div class="pwrap"><div class="pbar" style="width:' + pct + '%"></div></div><div class="plabel"><span>p.' + item.pagesRead + '</span><span>' + pct + '%</span></div>' : '') +
+      (item.notes ? '<div class="rv-content" style="margin-top:12px">' + renderMd(item.notes) + '</div>' : '') +
+      renderLinksChips(item.links) + renderXrefChips(item.xrefs) +
+      (proj ? '<div style="margin-top:8px"><span class="card-tag">🗂 ' + esc(proj.name) + '</span></div>' : '') +
+      '<div class="rv-actions">' +
+        '<button class="rv-btn" onclick="closeM(\'mo-read\');openBook(books.find(x=>x.id===\'' + id + '\'))">✏ Edit</button>' +
+        '<button class="rv-btn" onclick="startTimerById(\'' + id + '\')">⏱ Timer</button>' +
+        '<button class="rv-btn" onclick="duplicateEntry(\'book\',\'' + id + '\')">⧉ Dup</button>' +
+        '<button class="rv-btn" style="color:#c44" onclick="if(confirm(\'Remove?\')){{deleteBook(\'' + id + '\',{stopPropagation:()=>{}});closeM(\'mo-read\')}}" >🗑</button>' +
+      '</div>';
+  } else if (kind === 'note') {
+    html = '<div class="rv-badge">' + icons.note + ' ' + (item.type || 'note') + '</div>' +
+      '<div class="rv-title">' + esc(item.title) + '</div>' +
+      '<div class="rv-meta">' + (item.ref ? esc(item.ref) + ' · ' : '') + timeAgo(item.updated) + (proj ? ' · 🗂 ' + esc(proj.name) : '') + '</div>' +
+      '<div class="rv-content">' + renderMd(item.content) + '</div>' +
+      ((item.tags || []).length ? '<div style="margin-top:8px">' + item.tags.map(t => tagChip(t, 'note')).join('') + '</div>' : '') +
+      renderLinksChips(item.links) + renderXrefChips(item.xrefs) + renderRelated(item) +
+      '<div class="rv-actions">' +
+        '<button class="rv-btn" onclick="closeM(\'mo-read\');openNote(notes.find(x=>x.id===\'' + id + '\'))">✏ Edit</button>' +
+        '<button class="rv-btn" onclick="shareEntry(\'note\',\'' + id + '\')">📤 Share</button>' +
+        '<button class="rv-btn" onclick="duplicateEntry(\'note\',\'' + id + '\')">⧉ Dup</button>' +
+        '<button class="rv-btn" style="color:#c44" onclick="if(confirm(\'Delete?\')){{deleteNote(\'' + id + '\',{stopPropagation:()=>{}});closeM(\'mo-read\')}}" >🗑</button>' +
+      '</div>';
+  } else if (kind === 'idea') {
+    html = '<div class="rv-badge">' + icons.idea + ' ' + (priIcon[item.priority] || '◆') + ' ' + item.priority + ' priority</div>' +
+      '<div class="rv-title">' + esc(item.title) + '</div>' +
+      '<div class="rv-meta">' + (item.ref ? esc(item.ref) + ' · ' : '') + timeAgo(item.updated) + (proj ? ' · 🗂 ' + esc(proj.name) : '') + '</div>' +
+      (item.content ? '<div class="rv-content">' + renderMd(item.content) + '</div>' : '') +
+      ((item.tags || []).length ? '<div style="margin-top:8px">' + item.tags.map(t => tagChip(t, 'idea')).join('') + '</div>' : '') +
+      renderLinksChips(item.links) + renderXrefChips(item.xrefs) + renderRelated(item) +
+      '<div class="rv-actions">' +
+        '<button class="rv-btn" onclick="closeM(\'mo-read\');openIdea(ideas.find(x=>x.id===\'' + id + '\'))">✏ Edit</button>' +
+        '<button class="rv-btn" onclick="duplicateEntry(\'idea\',\'' + id + '\')">⧉ Dup</button>' +
+        '<button class="rv-btn" style="color:#c44" onclick="if(confirm(\'Delete?\')){{deleteIdea(\'' + id + '\',{stopPropagation:()=>{}});closeM(\'mo-read\')}}" >🗑</button>' +
+      '</div>';
+  } else if (kind === 'citation') {
+    html = '<div class="rv-badge">' + icons.citation + ' ' + item.type + '</div>' +
+      '<div class="rv-meta">' + (item.author ? esc(item.author) + ' · ' : '') + timeAgo(item.updated) + '</div>' +
+      '<div class="cbox">' + esc(item.quote) + '<div class="cref">' + esc(item.ref) + (item.translation ? ' (' + esc(item.translation) + ')' : '') + '</div></div>' +
+      (item.doi ? '<div style="margin-top:6px"><a class="link-chip" href="' + (item.doi.startsWith('http') ? esc(item.doi) : 'https://doi.org/' + esc(item.doi)) + '" target="_blank" rel="noopener">🔗 ' + esc(item.doi) + '</a></div>' : '') +
+      (item.commentary ? '<div class="rv-content" style="margin-top:10px">' + renderMd(item.commentary) + '</div>' : '') +
+      (proj ? '<div style="margin-top:8px"><span class="card-tag">🗂 ' + esc(proj.name) + '</span></div>' : '') +
+      ((item.tags || []).length ? '<div style="margin-top:8px">' + item.tags.map(t => tagChip(t, 'citation')).join('') + '</div>' : '') +
+      renderLinksChips(item.links) + renderXrefChips(item.xrefs) + renderRelated(item) +
+      '<div class="rv-actions">' +
+        '<button class="rv-btn" onclick="closeM(\'mo-read\');openCite(citations.find(x=>x.id===\'' + id + '\'))">✏ Edit</button>' +
+        '<button class="rv-btn" onclick="openCiteFmt(\'' + id + '\')">📝 Format</button>' +
+        '<button class="rv-btn" onclick="copyCite(\'' + id + '\')">📋 Copy</button>' +
+        '<button class="rv-btn" onclick="duplicateEntry(\'citation\',\'' + id + '\')">⧉ Dup</button>' +
+        '<button class="rv-btn" style="color:#c44" onclick="if(confirm(\'Delete?\')){{deleteCite(\'' + id + '\',{stopPropagation:()=>{}});closeM(\'mo-read\')}}" >🗑</button>' +
+      '</div>';
+  }
+  document.getElementById('readContent').innerHTML = html;
+  openM('mo-read');
+}
+
+// ════════════════════════════════════════════════
+// SHARE & DUPLICATE
+// ════════════════════════════════════════════════
+function shareEntry(kind, id) {
+  const item = { note: notes, idea: ideas }[kind]?.find(x => x.id === id); if (!item) return;
+  const text = (item.title + '\n\n' + (item.content || '')).trim();
+  if (navigator.share) navigator.share({ title: item.title, text }).catch(() => {});
+  else if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => toast('📋 Copied'));
+}
+function duplicateEntry(kind, id) {
+  const arrs = { book: books, note: notes, idea: ideas, citation: citations };
+  const arr = arrs[kind]; const item = arr.find(x => x.id === id); if (!item) return;
+  const n = { ...JSON.parse(JSON.stringify(item)), id: Date.now().toString(), updated: Date.now(), starred: false };
+  if (n.title) n.title = 'Copy of ' + n.title;
+  arr.unshift(n); save(kind + 's', arr);
+  closeM('mo-read');
+  if (kind === 'book') renderLibrary();
+  else if (kind === 'note') renderNotes();
+  else if (kind === 'idea') renderIdeas();
+  else if (kind === 'citation') renderCitations();
+  updateStats(); renderHome(); toast('⧉ Duplicated');
+}
+
+// ════════════════════════════════════════════════
+// CITATION FORMATTER
+// ════════════════════════════════════════════════
+function openCiteFmt(id) {
+  const c = citations.find(x => x.id === id); if (!c) return;
+  const a = c.author || 'Author', y = c.year || 'n.d.', t = c.ref || 'Title', p = c.pub || '', doi = c.doi || '';
+  const doiStr = doi ? ` doi:${doi}` : '';
+  const apa = `${a} (${y}). ${t}.${p ? ' ' + p + '.' : ''}${doiStr}`;
+  const chicago = `${a}. "${t}." ${p ? p + ', ' : ''}${y}${doiStr}.`;
+  const mla = `${a}. "${t}." ${p ? p + ', ' : ''}${y}${doiStr}.`;
+  const turabian = `${a}. "${t}," in ${p || 'Source'} (${y})${doiStr}.`;
+  const sameAuthor = citations.filter(x => x.id !== id && x.author && x.author === c.author);
+  const ibibNote = sameAuthor.length
+    ? `<div class="ibid-note">✦ ${esc(a)} appears in ${sameAuthor.length} other citation(s). Use <em>ibid.</em> if citing consecutively.</div>`
+    : '';
+  document.getElementById('citeFmtContent').innerHTML = ibibNote +
+    [['APA', apa], ['Chicago', chicago], ['MLA', mla], ['Turabian', turabian]].map(([sty, tx]) =>
+      `<div class="cfbox"><div class="cfstyle">${sty}</div><div class="cftext">${esc(tx)}</div>` +
+      `<button class="cfcopy" onclick="copyText(${JSON.stringify(tx)})">📋</button></div>`
+    ).join('');
+  closeM('mo-read'); openM('mo-citefmt');
+}
+function copyText(t) {
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => toast('📋 Copied'));
+}
+function copyCite(id) {
+  const c = citations.find(x => x.id === id); if (!c) return;
+  const t = '"' + c.quote + '" — ' + c.ref + (c.author ? ' (' + c.author + ')' : '');
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => toast('📋 Copied'));
+}
+
+// ════════════════════════════════════════════════
+// READING TIMER
+// ════════════════════════════════════════════════
+let _tInt = null, _tSecs = 0, _tPaused = false, _tId = '', _tTitle = '';
+function startTimerById(bookId) {
+  const book = books.find(b => b.id === bookId);
+  startTimer(bookId, book ? book.title : 'Reading');
+}
+function startTimer(bookId, bookTitle) {
+  if (_tInt) clearInterval(_tInt);
+  _tId = bookId; _tTitle = bookTitle; _tSecs = 0; _tPaused = false;
+  document.getElementById('twBook').textContent = bookTitle;
+  document.getElementById('timerBookName').textContent = bookTitle;
+  document.getElementById('timerPauseBtn').textContent = '⏸ Pause';
+  document.getElementById('timerStatus').textContent = 'RUNNING';
+  _updateTimer();
+  _tInt = setInterval(() => { if (!_tPaused) { _tSecs++; _updateTimer(); } }, 1000);
+  document.getElementById('tw').classList.add('active');
+  closeM('mo-read'); toast('⏱ Timer started');
+}
+function toggleTimerPause() {
+  _tPaused = !_tPaused;
+  document.getElementById('timerPauseBtn').textContent = _tPaused ? '▶ Resume' : '⏸ Pause';
+  document.getElementById('timerStatus').textContent = _tPaused ? 'PAUSED' : 'RUNNING';
+}
+function stopTimer() {
+  if (_tInt) clearInterval(_tInt); _tInt = null;
+  const mins = Math.round(_tSecs / 60);
+  document.getElementById('tw').classList.remove('active');
+  if (mins > 0) {
+    studyLog.push({ date: todayStr(), text: 'Reading: ' + _tTitle, mins, ts: Date.now() });
+    save('log', studyLog); renderStreak(); toast('⏱ ' + mins + ' min logged');
+  }
+  _tSecs = 0; _tPaused = false;
+}
+function _updateTimer() {
+  const m = Math.floor(_tSecs / 60).toString().padStart(2, '0');
+  const s = (_tSecs % 60).toString().padStart(2, '0');
+  const t = m + ':' + s;
+  document.getElementById('twTime').textContent = t;
+  document.getElementById('timerDisplay').textContent = t;
+}
+
+// ════════════════════════════════════════════════
+// TAG BROWSER
+// ════════════════════════════════════════════════
+function openTagBrowser() { renderTagBrowser(); openM('mo-tags'); }
+function renderTagBrowser() {
+  const q = (document.getElementById('tagQ') || { value: '' }).value.toLowerCase();
+  const tf = {};
+  [...notes, ...ideas, ...citations].forEach(x => (x.tags || []).forEach(t => { tf[t] = (tf[t] || 0) + 1; }));
+  let tags = Object.entries(tf).sort((a, b) => b[1] - a[1]);
+  if (q) tags = tags.filter(([t]) => t.toLowerCase().includes(q));
+  const el = document.getElementById('tagList');
+  if (!tags.length) { el.innerHTML = '<div class="empty" style="padding:20px"><div class="es">No tags found</div></div>'; return; }
+  el.innerHTML = tags.map(([t, n]) =>
+    `<div class="tag-item">
+      <span class="tag-name" onclick="filterByTag('${esc(t)}')">${esc(t)}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="tag-count">${n}</span>
+        <button class="cbtn" style="flex:0;padding:2px 8px;font-size:9px" onclick="startTagRename('${esc(t)}')">✏</button>
+      </div>
+    </div>`
+  ).join('');
+}
+function filterByTag(tag) { closeM('mo-tags'); nav('notes'); document.getElementById('noteQ').value = tag; renderNotes(); }
+function startTagRename(tag) {
+  const area = document.getElementById('tagRenameArea');
+  document.getElementById('tagOldName').value = tag;
+  document.getElementById('tagNewName').value = '';
+  area.style.display = 'block';
+  setTimeout(() => document.getElementById('tagNewName').focus(), 50);
+}
+function confirmTagRename() {
+  const oldTag = document.getElementById('tagOldName').value.trim();
+  const newTag = document.getElementById('tagNewName').value.trim();
+  if (!newTag) return toast('Enter a new tag name');
+  if (oldTag === newTag) return;
+  let count = 0;
+  [...notes, ...ideas, ...citations].forEach(item => {
+    if ((item.tags || []).includes(oldTag)) {
+      item.tags = item.tags.map(t => t === oldTag ? newTag : t);
+      count++;
+    }
+  });
+  save('notes', notes); save('ideas', ideas); save('citations', citations);
+  document.getElementById('tagRenameArea').style.display = 'none';
+  renderTagBrowser();
+  toast(`✦ Renamed "${oldTag}" → "${newTag}" on ${count} entries`);
+}
+
+// ════════════════════════════════════════════════
+// FULLSCREEN EDITOR
+// ════════════════════════════════════════════════
+let _fsePreviewOn = false;
+let _fseOpen = false;
+function openFSE() {
+  _fseOpen = true; _fsePreviewOn = false;
+  const titleEl = document.getElementById('nTitle'), contentEl = document.getElementById('nContent');
+  document.getElementById('fseTitle').value = titleEl ? titleEl.value : '';
+  document.getElementById('fseContent').value = contentEl ? contentEl.value : '';
+  document.getElementById('fsePreview').style.display = 'none';
+  document.getElementById('fseContent').style.display = 'block';
+  document.getElementById('fsePreviewBtn').textContent = '👁 Preview';
+  document.getElementById('fse').classList.add('open');
+  updateFseWc();
+  setTimeout(() => document.getElementById('fseContent').focus(), 100);
+}
+function closeFSE() {
+  _fseOpen = false;
+  const titleEl = document.getElementById('nTitle'), contentEl = document.getElementById('nContent');
+  if (titleEl) titleEl.value = document.getElementById('fseTitle').value;
+  if (contentEl) { contentEl.value = document.getElementById('fseContent').value; updateNoteWc(); autosaveDraft(); }
+  document.getElementById('fse').classList.remove('open');
+}
+function updateFseWc() {
+  const ta = document.getElementById('fseContent');
+  const wc = ta.value.trim() ? ta.value.trim().split(/\s+/).length : 0;
+  document.getElementById('fseWc').textContent = wc + ' words';
+}
+function toggleFsePreview() {
+  _fsePreviewOn = !_fsePreviewOn;
+  const ta = document.getElementById('fseContent'), pv = document.getElementById('fsePreview'), btn = document.getElementById('fsePreviewBtn');
+  if (_fsePreviewOn) {
+    pv.innerHTML = renderMd(ta.value);
+    pv.style.display = 'block'; ta.style.display = 'none';
+    btn.textContent = '✏ Edit'; btn.style.background = 'rgba(201,168,76,.15)'; btn.style.borderColor = 'var(--gold-dim)'; btn.style.color = 'var(--gold)';
+  } else {
+    pv.style.display = 'none'; ta.style.display = 'block';
+    btn.textContent = '👁 Preview'; btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = '';
+    ta.focus();
+  }
+}
+function insertMd(before, after) {
+  const ta = document.getElementById('fseContent');
+  const ss = ta.selectionStart, se = ta.selectionEnd;
+  const sel = ta.value.slice(ss, se);
+  const rep = before + (sel || 'text') + after;
+  ta.value = ta.value.slice(0, ss) + rep + ta.value.slice(se);
+  ta.focus(); ta.setSelectionRange(ss + before.length, ss + before.length + (sel || 'text').length);
+  updateFseWc();
+}
+
+// ════════════════════════════════════════════════
+// QUICK CAPTURE
+// ════════════════════════════════════════════════
+function saveQuickCapture() {
+  const val = document.getElementById('qcInput').value.trim();
+  if (!val) return;
+  ideas.unshift({ id: Date.now().toString(), title: val, priority: 'medium', tags: [], links: [], xrefs: [], updated: Date.now(), starred: false });
+  save('ideas', ideas);
+  document.getElementById('qcInput').value = '';
+  updateStats(); renderHome();
+  toast('💡 Captured!');
+}
+
+// ════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ════════════════════════════════════════════════
+function exportJSON() {
+  const data = { books, notes, ideas, citations, projects, studyLog, exportDate: new Date().toISOString(), version: '5' };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'codex-' + todayStr() + '.json'; a.click();
+  URL.revokeObjectURL(url); toast('📤 Backup downloaded');
+}
+function importJSON(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const choice = confirm(
+        `Found: ${(data.books || []).length} books, ${(data.notes || []).length} notes, ` +
+        `${(data.ideas || []).length} ideas, ${(data.citations || []).length} citations.\n\n` +
+        `OK = Merge (add without overwriting existing)\nCancel = Replace all`
+      );
+      function mergeArr(existing, incoming) {
+        const ids = new Set(existing.map(x => x.id));
+        return [...existing, ...(incoming || []).filter(x => !ids.has(x.id))];
+      }
+      if (choice) {
+        books = mergeArr(books, data.books); notes = mergeArr(notes, data.notes);
+        ideas = mergeArr(ideas, data.ideas); citations = mergeArr(citations, data.citations);
+        projects = mergeArr(projects, data.projects); studyLog = mergeArr(studyLog, data.studyLog || []);
+        toast('📥 Merged successfully!');
+      } else {
+        books = data.books || []; notes = data.notes || []; ideas = data.ideas || [];
+        citations = data.citations || []; projects = data.projects || []; studyLog = data.studyLog || [];
+        toast('📥 Data replaced!');
+      }
+      save('books', books); save('notes', notes); save('ideas', ideas);
+      save('citations', citations); save('projects', projects); save('log', studyLog);
+      renderHome(); updateStats(); renderStreak(); populateProjSelects();
+      closeM('mo-settings');
+    } catch { toast('Error: invalid file format'); }
+  };
+  reader.readAsText(file); input.value = '';
+}
+function copyExport() {
+  const t = document.getElementById('exportResult').value;
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => toast('📋 Copied!'));
+}
+function clearAllData() {
+  if (!confirm('Delete ALL data? This cannot be undone.')) return;
+  if (!confirm('Absolutely sure? All entries will be permanently deleted.')) return;
+  books = []; notes = []; ideas = []; citations = []; projects = []; studyLog = [];
+  ['books', 'notes', 'ideas', 'citations', 'projects', 'log'].forEach(k => save(k, []));
+  renderHome(); updateStats(); renderStreak(); closeM('mo-settings'); toast('All data cleared');
+}
+
+// ════════════════════════════════════════════════
+// PROJECT EXPORTS
+// ════════════════════════════════════════════════
+function exportProjMd(id) {
+  const p = projects.find(x => x.id === id); if (!p) return;
+  let md = '# ' + p.name + '\n\n';
+  if (p.desc) md += p.desc + '\n\n';
+  const pb = books.filter(b => b.projId === id), pn = notes.filter(n => n.projId === id), pi = ideas.filter(i => i.projId === id), pc = citations.filter(c => c.projId === id);
+  if (pb.length) { md += '## Books\n\n'; pb.forEach(b => { md += '- **' + b.title + '**' + (b.author ? ' by ' + b.author : '') + (b.status ? ' — ' + b.status : '') + '\n'; }); }
+  if (pn.length) { md += '\n## Notes\n\n'; pn.forEach(n => { md += '### ' + n.title + '\n' + (n.ref ? '_' + n.ref + '_\n\n' : '') + (n.content || '') + '\n\n---\n\n'; }); }
+  if (pi.length) { md += '## Ideas\n\n'; pi.forEach(i => { md += '- **[' + i.priority + ']** ' + i.title + '\n'; }); }
+  if (pc.length) { md += '\n## Citations\n\n'; pc.forEach(c => { md += '> ' + c.quote + '\n— _' + c.ref + '_\n\n'; }); }
+  document.getElementById('exportResult').value = md;
+  closeM('mo-projDetail'); openM('mo-export');
+}
+function exportProjBibliography(id) {
+  const p = projects.find(x => x.id === id); if (!p) return;
+  const pc = citations.filter(c => c.projId === id);
+  if (!pc.length) return toast('No citations in this project');
+  let bib = `# Bibliography: ${p.name}\n\n`;
+  const sorted = [...pc].sort((a, b) => (a.author || a.ref).localeCompare(b.author || b.ref));
+  sorted.forEach((c, i) => {
+    const a = c.author || '', y = c.year || 'n.d.', t = c.ref, pub = c.pub || '', doi = c.doi || '';
+    bib += `${i + 1}. ${a}${a ? ' ' : ''}(${y}). ${t}.${pub ? ' ' + pub + '.' : ''}${doi ? ' doi:' + doi : ''}\n`;
+  });
+  document.getElementById('exportResult').value = bib;
+  closeM('mo-projDetail'); openM('mo-export');
+}
+
+// ════════════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════════════
+function toggleTheme() {
+  const body = document.body;
+  body.classList.toggle('light');
+  const on = body.classList.contains('light');
+  document.getElementById('themeToggle').classList.toggle('on', on);
+  localStorage.setItem('cx2_theme', on ? 'light' : 'dark');
+}
+function setFontSize(sz) {
+  document.body.classList.remove('fs-sm', 'fs-lg');
+  if (sz === 'sm') document.body.classList.add('fs-sm');
+  else if (sz === 'lg') document.body.classList.add('fs-lg');
+  document.querySelectorAll('.fsize-btn').forEach((b, i) => b.classList.toggle('active', i === (sz === 'sm' ? 0 : sz === 'lg' ? 2 : 1)));
+  localStorage.setItem('cx2_fsize', sz);
+}
+function applySettings() {
+  const theme = localStorage.getItem('cx2_theme');
+  if (theme === 'light') { document.body.classList.add('light'); document.getElementById('themeToggle').classList.add('on'); }
+  const fsize = localStorage.getItem('cx2_fsize');
+  if (fsize) setFontSize(fsize);
+}
+function openSettings() { openM('mo-settings'); }
+
+// ════════════════════════════════════════════════
+// BULK OPERATIONS
+// ════════════════════════════════════════════════
+let _selMode = null;
+let _selIds = new Set();
+function toggleSelectMode(kind) {
+  if (_selMode === kind) { clearSelection(); return; }
+  _selMode = kind; _selIds = new Set();
+  if (kind === 'note') renderNotes();
+  else if (kind === 'idea') renderIdeas();
+  else if (kind === 'cite') renderCitations();
+  toast('☑ Select mode on — tap items to select');
+}
+function clearSelection() {
+  _selMode = null; _selIds = new Set();
+  renderNotes(); renderIdeas(); renderCitations();
+}
+function toggleItemSelect(kind, id) {
+  if (_selIds.has(id)) _selIds.delete(id); else _selIds.add(id);
+  const el = document.getElementById('sel-' + id);
+  if (el) el.textContent = _selIds.has(id) ? '✓' : '○';
+  // Update bulk bar counts
+  ['note', 'idea', 'cite'].forEach(k => {
+    const bar = document.getElementById(k + 'BulkBar');
+    if (bar && bar.style.display !== 'none') { const bc = bar.querySelector('.bulk-count'); if (bc) bc.textContent = _selIds.size + ' selected'; }
+  });
+}
+function openBulkOps() {
+  if (!_selIds.size) return toast('Select some items first');
+  const sel = document.getElementById('bulkProjSel');
+  if (sel) sel.innerHTML = '<option value="">— None —</option>' + projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  document.getElementById('bulkSubtitle').textContent = _selIds.size + ' item(s) selected';
+  openM('mo-bulk');
+}
+function bulkAddTag() {
+  const tag = document.getElementById('bulkTagInput').value.trim();
+  if (!tag) return toast('Enter a tag name');
+  const arrs = { note: notes, idea: ideas, cite: citations };
+  const keyMap = { note: 'notes', idea: 'ideas', cite: 'citations' };
+  const arr = arrs[_selMode]; if (!arr) return;
+  let count = 0;
+  arr.forEach(item => {
+    if (_selIds.has(item.id)) {
+      if (!(item.tags || []).includes(tag)) { item.tags = [...(item.tags || []), tag]; count++; }
+    }
+  });
+  save(keyMap[_selMode], arr);
+  document.getElementById('bulkTagInput').value = '';
+  toast(`🏷 Tagged ${count} items with "${tag}"`);
+}
+function bulkMoveProject() {
+  const projId = document.getElementById('bulkProjSel').value;
+  const arrs = { note: notes, idea: ideas, cite: citations };
+  const keyMap = { note: 'notes', idea: 'ideas', cite: 'citations' };
+  const arr = arrs[_selMode]; if (!arr) return;
+  arr.forEach(item => { if (_selIds.has(item.id)) item.projId = projId; });
+  save(keyMap[_selMode], arr);
+  const proj = projects.find(p => p.id === projId);
+  toast('🗂 Moved to ' + (proj ? proj.name : 'No Project'));
+  closeM('mo-bulk'); clearSelection();
+}
+function bulkDelete() {
+  if (!confirm(`Delete ${_selIds.size} selected items? This cannot be undone.`)) return;
+  const keyMap = { note: 'notes', idea: 'ideas', cite: 'citations' };
+  if (_selMode === 'note') { notes = notes.filter(x => !_selIds.has(x.id)); save('notes', notes); }
+  else if (_selMode === 'idea') { ideas = ideas.filter(x => !_selIds.has(x.id)); ideas = ideas; save('ideas', ideas); }
+  else if (_selMode === 'cite') { citations = citations.filter(x => !_selIds.has(x.id)); save('citations', citations); }
+  toast(`🗑 Deleted ${_selIds.size} items`);
+  closeM('mo-bulk'); clearSelection(); updateStats(); renderHome();
+}
+
+// ════════════════════════════════════════════════
+// SWIPE TO ACTION
+// ════════════════════════════════════════════════
+let _sw = null, _tx = 0;
+document.addEventListener('touchstart', e => {
+  const wrap = e.target.closest('.swrap');
+  if (!wrap) return;
+  _sw = wrap; _tx = e.touches[0].clientX;
+}, { passive: true });
+document.addEventListener('touchmove', e => {
+  if (!_sw) return;
+  const dx = e.touches[0].clientX - _tx;
+  const card = _sw.querySelector('.card'), acts = _sw.querySelector('.sact');
+  if (!card || !acts) return;
+  if (dx < -20) {
+    const x = Math.max(-120, dx);
+    card.style.transform = `translateX(${x}px)`;
+    acts.classList.toggle('show', dx < -60);
+  } else { card.style.transform = ''; acts.classList.remove('show'); }
+}, { passive: true });
+document.addEventListener('touchend', e => {
+  if (!_sw) return;
+  if (e.changedTouches[0].clientX - _tx > -60) {
+    const card = _sw.querySelector('.card'); if (card) card.style.transform = '';
+    _sw.querySelector('.sact')?.classList.remove('show');
+  }
+  _sw = null;
+});
+function resetSwipe(el) {
+  const w = el.closest('.swrap'); if (!w) return;
+  w.querySelector('.card').style.transform = '';
+  w.querySelector('.sact')?.classList.remove('show');
+}
+
+</script>
+</body>
+</html>
